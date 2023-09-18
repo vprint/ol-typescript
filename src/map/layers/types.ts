@@ -1,6 +1,6 @@
 import Style from 'ol/style/Style';
 import VectorSource from 'ol/source/Vector.js';
-import VectorTileSource from 'ol/source/VectorTile.js';
+import { VectorTileRenderType } from 'ol/layer/VectorTile';
 
 export interface token {
   JAWGS: string
@@ -9,7 +9,7 @@ export interface token {
 
 
 // Interface des fonds de plan
-export interface backgroundLayer {
+export interface backgroundLayerType {
   NAME: string;
   URL: string;
   IMG: string;
@@ -19,13 +19,13 @@ export interface backgroundLayer {
   VISIBLE: boolean;
 }
 export interface backgroundLayerSettings {
-  [backgroundLayerName: string]: backgroundLayer;
+  [backgroundLayerName: string]: backgroundLayerType;
 }
 
 
 
 // Interface des tuiles vectorielles
-export interface vectorTileLayer {
+export interface vectorTileLayerType {
   NAME: string;
   ZINDEX: number;
   ATTRIBUTION?: string[];
@@ -33,16 +33,16 @@ export interface vectorTileLayer {
   VISIBLE: boolean;
   URL?: string;
   LAYERNAME?: string;
-  RENDERMODE?: string;
+  RENDERMODE?: VectorTileRenderType;
 }
 export interface vectorTileLayerSettings {
-  [vectorTileLayerName: string]: vectorTileLayer
+  [vectorTileLayerName: string]: vectorTileLayerType
 }
 
 
 
 // Interface des couches vectorielles
-export interface vectorLayer {
+export interface vectorLayerType {
   RENDER?: string;
   SOURCE: VectorSource;
   NAME: string;
@@ -51,5 +51,5 @@ export interface vectorLayer {
   STYLE?: Style
 }
 export interface vectorLayerSettings {
-  [vectorLayerName: string]: vectorLayer
+  [vectorLayerName: string]: vectorLayerType
 }

@@ -64,6 +64,7 @@ export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
     }),
     VISIBLE: false,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
+    RENDERMODE: 'hybrid'
   }
 }
 

@@ -21,20 +21,21 @@ class MapLayers {
      */
     function addBackgroundLayers(): void {
       for (const layer in BACKGROUND_LAYERS_SETTINGS) {
+        const bl = BACKGROUND_LAYERS_SETTINGS[layer]
         map.addLayer(
           new TileLayer({
             source: new XYZ({
-              url: BACKGROUND_LAYERS_SETTINGS[layer].TOKEN ?
-                `${BACKGROUND_LAYERS_SETTINGS[layer].URL}access-token=${BACKGROUND_LAYERS_SETTINGS[layer].TOKEN}` :
-                `${BACKGROUND_LAYERS_SETTINGS[layer].URL}`,
+              url: bl.TOKEN ?
+                `${bl.URL}access-token=${bl.TOKEN}` :
+                `${bl.URL}`,
               tilePixelRatio: 2,
-              attributions: BACKGROUND_LAYERS_SETTINGS[layer].ATTRIBUTION,
+              attributions: bl.ATTRIBUTION,
             }),
-            zIndex: BACKGROUND_LAYERS_SETTINGS[layer].ZINDEX,
+            zIndex: bl.ZINDEX,
             properties: {
-              'name': BACKGROUND_LAYERS_SETTINGS[layer].NAME
+              'name': bl.NAME
             },
-            visible: BACKGROUND_LAYERS_SETTINGS[layer].VISIBLE
+            visible: bl.VISIBLE
           })
         )
       }
@@ -45,14 +46,15 @@ class MapLayers {
      */
     function addVectorLayers(): void {
       for (const layer in VECTOR_LAYERS_SETTINGS) {
+        const vl = VECTOR_LAYERS_SETTINGS[layer]
         map.addLayer(
           new VectorLayer({
-            source: VECTOR_LAYERS_SETTINGS[layer].SOURCE,
-            zIndex: VECTOR_LAYERS_SETTINGS[layer].ZINDEX,
-            style: VECTOR_LAYERS_SETTINGS[layer].STYLE,
-            visible: VECTOR_LAYERS_SETTINGS[layer].VISIBLE,
+            source: vl.SOURCE,
+            zIndex: vl.ZINDEX,
+            style: vl.STYLE,
+            visible: vl.VISIBLE,
             properties: {
-              'name': VECTOR_LAYERS_SETTINGS[layer].NAME
+              'name': vl.NAME
             },
 
           })
@@ -65,37 +67,39 @@ class MapLayers {
      */
     function addVectorTileLayers(): void {
       for (const layer in VECTOR_TILE_LAYERS_SETTINGS) {
+        const vtl = VECTOR_TILE_LAYERS_SETTINGS[layer]
 
         // Si la variable URL est renseignée alors la VectorTileSource est créée.
-        let vct: VectorTileSource | null = null
-        if (VECTOR_TILE_LAYERS_SETTINGS[layer].URL) {
-          vct = new VectorTileSource({
+        let vectorTileSource: VectorTileSource | null = null
+        if (vtl.URL) {
+          vectorTileSource = new VectorTileSource({
             format: new MVT({
               idProperty: 'id'
             }),
-            url: `${VECTOR_TILE_LAYERS_SETTINGS[layer].URL}/{z}/{x}/{y}.pbf`,
-            attributions: VECTOR_TILE_LAYERS_SETTINGS[layer].ATTRIBUTION
+            url: `${vtl.URL}/{z}/{x}/{y}.pbf`,
+            attributions: vtl.ATTRIBUTION
           })
         }
 
         // Si LayerName est renseigné alors la source est récupérée via la fonction getLayerByName.
         else {
-          const layerName = VECTOR_TILE_LAYERS_SETTINGS[layer].NAME
+          const layerName = vtl.NAME
           if (typeof layerName === 'string') {
-            vct = mapStore.getLayerByName(layerName)?.getProperties().source;
+            vectorTileSource = mapStore.getLayerByName(layerName)?.getProperties().source;
           }
         }
 
         // Ajout de la couche vectorielle tuilée
-        if (vct) {
+        if (vectorTileSource) {
           map.addLayer(
             new VectorTileLayer({
-              source: vct,
-              zIndex: VECTOR_TILE_LAYERS_SETTINGS[layer].ZINDEX,
+              source: vectorTileSource,
+              zIndex: vtl.ZINDEX,
               properties: {
-                'name': VECTOR_TILE_LAYERS_SETTINGS[layer].NAME,
+                'name': vtl.NAME,
               },
-              preload: Infinity
+              preload: Infinity,
+              renderMode: vtl.RENDERMODE
             })
           )
         }

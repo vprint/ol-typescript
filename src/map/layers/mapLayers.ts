@@ -1,5 +1,4 @@
 import { Map } from 'ol';
-import { useMapStore } from 'src/stores/map-store';
 import TileLayer from 'ol/layer/Tile'
 import XYZ from 'ol/source/XYZ';
 import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS } from './enum'
@@ -13,8 +12,6 @@ import MVT from 'ol/format/MVT';
  */
 class MapLayers {
   constructor(map: Map) {
-
-    const mapStore = useMapStore()
 
     /**
      * ajout des fonds de plan
@@ -42,7 +39,7 @@ class MapLayers {
     }
 
     /**
-     * ajout des couhes vectorielles
+     * ajout des couches vectorielles
      */
     function addVectorLayers(): void {
       for (const layer in VECTOR_LAYERS_SETTINGS) {
@@ -69,37 +66,41 @@ class MapLayers {
       for (const layer in VECTOR_TILE_LAYERS_SETTINGS) {
         const vtl = VECTOR_TILE_LAYERS_SETTINGS[layer]
 
-        // Si la variable URL est renseignée alors la VectorTileSource est créée.
-        let vectorTileSource: VectorTileSource | null = null
-        if (vtl.URL) {
-          vectorTileSource = new VectorTileSource({
-            format: new MVT({
-              idProperty: 'id'
-            }),
-            url: `${vtl.URL}/{z}/{x}/{y}.pbf`,
-            attributions: vtl.ATTRIBUTION
-          })
-        }
-
-        // Si LayerName est renseigné alors la source est récupérée via la fonction getLayerByName.
-        else {
-          const layerName = vtl.NAME
-          if (typeof layerName === 'string') {
-            vectorTileSource = mapStore.getLayerByName(layerName)?.getProperties().source;
-          }
-        }
+        // Création de la source
+        const vectorTileSource = new VectorTileSource({
+          format: new MVT({
+            idProperty: 'id'
+          }),
+          url: `${vtl.URL}/{z}/{x}/{y}.pbf`,
+          attributions: vtl.ATTRIBUTION
+        })
 
         // Ajout de la couche vectorielle tuilée
-        if (vectorTileSource) {
+        map.addLayer(
+          new VectorTileLayer({
+            source: vectorTileSource,
+            zIndex: vtl.ZINDEX,
+            properties: {
+              'name': vtl.NAME,
+            },
+            preload: Infinity,
+            renderMode: vtl.RENDERMODE,
+            visible: vtl.VISIBLE
+          })
+        )
+
+        // Ajout de la couche d'édition
+        if (vtl.EDITABLE) {
           map.addLayer(
             new VectorTileLayer({
               source: vectorTileSource,
-              zIndex: vtl.ZINDEX,
+              zIndex: vtl.ZINDEX + 1,
               properties: {
-                'name': vtl.NAME,
+                'name': `${vtl.NAME}_edition`
               },
               preload: Infinity,
-              renderMode: vtl.RENDERMODE
+              renderMode: 'vector',
+              visible: false
             })
           )
         }

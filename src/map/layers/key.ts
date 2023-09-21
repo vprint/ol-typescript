@@ -1,5 +1,7 @@
-import { token } from './types'
+import { tokenSettings } from './types'
 
-export const HIDDEN_TOKEN: token = {
-  JAWGS: '2GrZUqJYwWQq7Yjjh2U9D6BIwBfEYABjjQTXDeAoA1VHH8pPGqX08ruNfrpwSMbE'
+export const HIDDEN_TOKEN: tokenSettings = {
+  JAWGS: {
+    TOKEN: '2GrZUqJYwWQq7Yjjh2U9D6BIwBfEYABjjQTXDeAoA1VHH8pPGqX08ruNfrpwSMbE'
+  }
 }

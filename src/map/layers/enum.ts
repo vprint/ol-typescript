@@ -11,7 +11,7 @@ export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
     ATTRIBUTION: [
       '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
     ],
-    TOKEN: HIDDEN_TOKEN.JAWGS,
+    TOKEN: HIDDEN_TOKEN.JAWGS.TOKEN,
     ZINDEX: 1,
     VISIBLE: false
   },
@@ -22,9 +22,9 @@ export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
     ATTRIBUTION: [
       '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
     ],
-    TOKEN: HIDDEN_TOKEN.JAWGS,
+    TOKEN: HIDDEN_TOKEN.JAWGS.TOKEN,
     ZINDEX: 1,
-    VISIBLE: false
+    VISIBLE: true
   },
   JAWGMAPS_DARK: {
     NAME: 'Sombre',
@@ -33,7 +33,7 @@ export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
     ATTRIBUTION: [
       '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
     ],
-    TOKEN: HIDDEN_TOKEN.JAWGS,
+    TOKEN: HIDDEN_TOKEN.JAWGS.TOKEN,
     ZINDEX: 1,
     VISIBLE: false
   },
@@ -45,14 +45,14 @@ export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     ],
     ZINDEX: 1,
-    VISIBLE: true
+    VISIBLE: false
   },
 }
 
 export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
-  SELECTION_LAYER: {
+  CARTOGRAPHY_LAYER: {
     ZINDEX: 3,
-    NAME: 'Selection',
+    NAME: 'Features',
     STYLE: new Style({
       stroke: new Stroke({
         color: 'rgba(220,50,225,1)',
@@ -62,10 +62,11 @@ export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
         color: 'rgba(220,50,225,0)',
       }),
     }),
-    VISIBLE: false,
+    VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
-    RENDERMODE: 'hybrid'
-  }
+    RENDERMODE: 'hybrid',
+    EDITABLE: true
+  },
 }
 
 export const VECTOR_LAYERS_SETTINGS: vectorLayerSettings = {

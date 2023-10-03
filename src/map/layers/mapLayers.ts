@@ -7,12 +7,15 @@ import VectorSource from 'ol/source/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile.js';
 import MVT from 'ol/format/MVT';
+import ApiRequestor from 'src/services/Api/ApiRequestor';
+import { Style } from 'ol/style';
 
 /**
  * Gestionnaire de couches
  */
 class MapLayers {
   private map;
+  private test: Style[] | undefined;
 
   constructor(map: Map) {
     this.map = map;
@@ -20,9 +23,17 @@ class MapLayers {
     this.addBackgroundLayers();
     this.addVectorLayers();
     this.addVectorTileLayers();
+    this.initialize();
   }
 
+  private async getStyles(): Promise<Style[]> {
+    const styles = await ApiRequestor.getStyles()
+    return styles
+  }
 
+  private async initialize() {
+    this.test = await this.getStyles()
+  }
 
   /**
    * ajout des fonds de plan

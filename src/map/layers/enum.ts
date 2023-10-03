@@ -1,7 +1,5 @@
 import { backgroundLayerSettings, vectorLayerSettings, vectorTileLayerSettings } from './types'
 import { HIDDEN_TOKEN } from './key'
-import { Fill, Stroke, Style } from 'ol/style';
-import VectorSource from 'ol/source/Vector.js';
 
 export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
   JAWGMAPS_STREETS: {
@@ -53,18 +51,8 @@ export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
   CARTOGRAPHY_LAYER: {
     ZINDEX: 3,
     NAME: 'Features',
-    STYLE: new Style({
-      stroke: new Stroke({
-        color: 'rgba(220,50,225,1)',
-        width: 4,
-      }),
-      fill: new Fill({
-        color: 'rgba(220,50,225,0)',
-      }),
-    }),
     VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
-    RENDERMODE: 'hybrid',
     EDITABLE: true
   },
 }
@@ -73,16 +61,6 @@ export const VECTOR_LAYERS_SETTINGS: vectorLayerSettings = {
   EDITION_LAYER: {
     ZINDEX: 4,
     NAME: 'Edition',
-    STYLE: new Style({
-      stroke: new Stroke({
-        color: 'rgba(220,50,225,1)',
-        width: 2,
-      }),
-      fill: new Fill({
-        color: 'rgba(220,50,225,0.4)',
-      }),
-    }),
     VISIBLE: true,
-    SOURCE: new VectorSource()
   },
 }

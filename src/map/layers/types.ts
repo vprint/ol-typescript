@@ -1,7 +1,4 @@
-import Style from 'ol/style/Style';
-import VectorSource from 'ol/source/Vector.js';
-import { VectorTileRenderType } from 'ol/layer/VectorTile';
-
+// Interface des tokens
 export interface token {
   TOKEN: string
 }
@@ -32,13 +29,8 @@ export interface vectorTileLayerType {
   NAME: string;
   ZINDEX: number;
   ATTRIBUTION?: string[];
-  STYLE?: Style;
   VISIBLE: boolean;
   URL?: string;
-  /**
-   * Paramètre destiné à l'édition. Si il est renseigné, il doit correpsondre au nom de la couche source à éditer.
-   */
-  RENDERMODE?: VectorTileRenderType;
   EDITABLE: boolean;
 }
 export interface vectorTileLayerSettings {
@@ -49,12 +41,9 @@ export interface vectorTileLayerSettings {
 
 // Interface des couches vectorielles
 export interface vectorLayerType {
-  RENDER?: string;
-  SOURCE: VectorSource;
   NAME: string;
   ZINDEX: number;
   VISIBLE: boolean;
-  STYLE?: Style
 }
 export interface vectorLayerSettings {
   [vectorLayerName: string]: vectorLayerType

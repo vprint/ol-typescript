@@ -3,6 +3,7 @@
     <q-page-container>
       <div id="map" class="map-container"></div>
     </q-page-container>
+    <background-tool/>
   </q-layout>
 </template>
 
@@ -14,6 +15,7 @@ import MapLayers from '../map/layers/mapLayers'
 
 import { ref, onMounted } from 'vue';
 import { useMapStore } from '../stores/map-store'
+import BackgroundTool from './BackgroundTool.vue';
 
 const map = ref<Map>()
 const mapStore = useMapStore();
@@ -30,7 +32,7 @@ onMounted(()=>{
     })
   });
 
-  mapStore.defineMap(map.value)
+  mapStore.setMap(map.value)
   new MapLayers(map.value);
 })
 </script>

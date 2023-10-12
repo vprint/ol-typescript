@@ -1,12 +1,15 @@
 import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile'
 import XYZ from 'ol/source/XYZ';
-import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS } from './enum'
+import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS, DEFAULT_STYLE } from './enum'
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile.js';
 import MVT from 'ol/format/MVT';
+import ApiRequestor from 'src/services/Api/ApiRequestor';
+import { LayersStyles } from 'src/services/Api/types';
+import { Style, Fill, Stroke } from 'ol/style';
 
 /**
  * Gestionnaire de couches
@@ -21,8 +24,6 @@ class MapLayers {
     this.addVectorLayers();
     this.addVectorTileLayers();
   }
-
-
 
   /**
    * ajout des fonds de plan
@@ -72,9 +73,26 @@ class MapLayers {
   /**
    * ajout des couche tuiles vectorielles
    */
-  private addVectorTileLayers(): void {
+  async addVectorTileLayers(): Promise<void> {
+
+    // Requêtage des styles
+    const ArrayStyles: LayersStyles = await ApiRequestor.getStyles();
+
+    // Style par défaut
+    const defaultStyle: Style = new Style({
+      fill: new Fill({
+        color: DEFAULT_STYLE.background_color
+      }),
+      stroke: new Stroke({
+        color: DEFAULT_STYLE.stroke_color,
+        width: DEFAULT_STYLE.stroke_width
+      })
+    });
+
+    // Itération sur les couches vectorielles tuilées
     for (const layer in VECTOR_TILE_LAYERS_SETTINGS) {
       const vtl = VECTOR_TILE_LAYERS_SETTINGS[layer]
+      const layerStyle = ArrayStyles[vtl.NAME]
 
       // Création de la source
       const vectorTileSource = new VectorTileSource({
@@ -82,7 +100,7 @@ class MapLayers {
           idProperty: 'id'
         }),
         url: `${vtl.URL}/{z}/{x}/{y}.pbf`,
-        attributions: vtl.ATTRIBUTION
+        attributions: vtl.ATTRIBUTION,
       })
 
       // Ajout de la couche vectorielle tuilée
@@ -95,6 +113,16 @@ class MapLayers {
           },
           preload: Infinity,
           renderMode: 'hybrid',
+          style: function (feature) {
+            // Application des styles
+            if (layerStyle) {
+              return layerStyle[feature.get(vtl.TYPE_ID)];
+            }
+            // Si le style n'est pas disponible alors le style par défaut est retourné
+            else {
+              return defaultStyle
+            }
+          },
           visible: vtl.VISIBLE
         })
       )

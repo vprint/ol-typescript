@@ -53,7 +53,8 @@ export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
     NAME: 'Features',
     VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
-    EDITABLE: true
+    EDITABLE: true,
+    TYPE_ID: 'id_typology'
   },
 }
 
@@ -64,3 +65,9 @@ export const VECTOR_LAYERS_SETTINGS: vectorLayerSettings = {
     VISIBLE: true,
   },
 }
+
+export const DEFAULT_STYLE = {
+  background_color: 'rgba(255,255,255,0.4)',
+  stroke_color: 'rgba(51,153,204,1)',
+  stroke_width: 1.25,
+};

@@ -32,6 +32,7 @@ export interface vectorTileLayerType {
   VISIBLE: boolean;
   URL?: string;
   EDITABLE: boolean;
+  TYPE_ID: string;
 }
 export interface vectorTileLayerSettings {
   [vectorTileLayerName: string]: vectorTileLayerType

@@ -4,27 +4,35 @@ import BaseLayer from 'ol/layer/Base';
 
 export const useMapStore = defineStore('map', {
   state: () => ({
-    map: null as Map | null
+    _map: null as Map | null
   }),
 
   getters: {
-    mainMap: (state) => state.map
+    map: (state) => state._map
   },
 
   actions: {
-    defineMap(map: Map) {
-      this.map = map;
+    /**
+     * Initialisation de la carte.
+     * @param map : ol map
+     */
+    async setMap(map: Map) {
+      this._map = map;
     },
 
+    /**
+   * Fonction de recherche de couche.
+   * @param name : nom de la couche à retourner
+   */
     getLayerByName(name: string): BaseLayer | null {
-      if (this.$state.map != null) {
-        return this.$state.map
+      if (this.$state._map != null) {
+        return this.$state._map
           .getLayers()
           .getArray()
           .find((layer: BaseLayer) => layer.get('name') === name) as BaseLayer;
       } else {
         return null
       }
-    }
+    },
   }
 });

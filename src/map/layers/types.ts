@@ -1,15 +1,15 @@
 // Interface des tokens
-export interface token {
+export interface Token {
   TOKEN: string
 }
-export interface tokenSettings {
-  [tokenName: string]: token
+export interface TokenSettings {
+  [tokenName: string]: Token
 }
 
 
 
 // Interface des fonds de plan
-export interface backgroundLayerType {
+export interface BackgroundLayerType {
   NAME: string;
   URL: string;
   IMG: string;
@@ -18,14 +18,14 @@ export interface backgroundLayerType {
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export interface backgroundLayerSettings {
-  [backgroundLayerName: string]: backgroundLayerType;
+export interface BackgroundLayerSettings {
+  [backgroundLayerName: string]: BackgroundLayerType;
 }
 
 
 
 // Interface des tuiles vectorielles
-export interface vectorTileLayerType {
+export interface VectorTileLayerType {
   NAME: string;
   ZINDEX: number;
   ATTRIBUTION?: string[];
@@ -34,18 +34,18 @@ export interface vectorTileLayerType {
   EDITABLE: boolean;
   TYPE_ID: string;
 }
-export interface vectorTileLayerSettings {
-  [vectorTileLayerName: string]: vectorTileLayerType
+export interface VectorTileLayerSettings {
+  [vectorTileLayerName: string]: VectorTileLayerType
 }
 
 
 
 // Interface des couches vectorielles
-export interface vectorLayerType {
+export interface VectorLayerType {
   NAME: string;
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export interface vectorLayerSettings {
-  [vectorLayerName: string]: vectorLayerType
+export interface VectorLayerSettings {
+  [vectorLayerName: string]: VectorLayerType
 }

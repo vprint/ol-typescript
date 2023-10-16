@@ -1,7 +1,7 @@
-import { backgroundLayerSettings, vectorLayerSettings, vectorTileLayerSettings } from './types'
+import { BackgroundLayerSettings, VectorLayerSettings, VectorTileLayerSettings } from './types'
 import { HIDDEN_TOKEN } from './key'
 
-export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
+export const BACKGROUND_LAYERS_SETTINGS: BackgroundLayerSettings = {
   JAWGMAPS_STREETS: {
     NAME: 'Basique',
     URL: 'https://tile.jawg.io/jawg-streets/{z}/{x}/{y}@2x.png?',
@@ -47,7 +47,7 @@ export const BACKGROUND_LAYERS_SETTINGS: backgroundLayerSettings = {
   },
 }
 
-export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
+export const VECTOR_TILE_LAYERS_SETTINGS: VectorTileLayerSettings = {
   CARTOGRAPHY_LAYER: {
     ZINDEX: 3,
     NAME: 'Features',
@@ -58,7 +58,7 @@ export const VECTOR_TILE_LAYERS_SETTINGS: vectorTileLayerSettings = {
   },
 }
 
-export const VECTOR_LAYERS_SETTINGS: vectorLayerSettings = {
+export const VECTOR_LAYERS_SETTINGS: VectorLayerSettings = {
   EDITION_LAYER: {
     ZINDEX: 4,
     NAME: 'Edition',

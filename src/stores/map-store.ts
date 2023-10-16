@@ -16,7 +16,7 @@ export const useMapStore = defineStore('map', {
      * Initialisation de la carte.
      * @param map : ol map
      */
-    async setMap(map: Map) {
+    async setMap(map: Map): Promise<void> {
       this._map = map;
     },
 

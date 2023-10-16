@@ -25,6 +25,10 @@ class MapLayers {
     this.addVectorTileLayers();
   }
 
+  public tester(tolog: string) {
+    console.log('test de focntionnement', tolog)
+  }
+
   /**
    * ajout des fonds de plan
    */

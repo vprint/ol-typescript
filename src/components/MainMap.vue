@@ -3,7 +3,7 @@
     <q-page-container>
       <div id="map" class="map-container"></div>
     </q-page-container>
-    <background-tool/>
+    <background-tool :map-layers="mapLayers"/>
   </q-layout>
 </template>
 
@@ -14,10 +14,12 @@ import {MAP_SETTINGS } from '../map/settings/enum'
 import MapLayers from '../map/layers/mapLayers'
 
 import { ref, onMounted } from 'vue';
+import type { Ref } from 'vue'
 import { useMapStore } from '../stores/map-store'
 import BackgroundTool from './BackgroundTool.vue';
 
-const map = ref<Map>()
+const map: Ref<Map | undefined> = ref<Map>()
+const mapLayers: Ref<MapLayers | undefined> = ref()
 const mapStore = useMapStore();
 
 onMounted(()=>{
@@ -33,7 +35,7 @@ onMounted(()=>{
   });
 
   mapStore.setMap(map.value)
-  new MapLayers(map.value);
+  mapLayers.value = new MapLayers(map.value);
 })
 </script>
 
@@ -46,5 +48,3 @@ onMounted(()=>{
   bottom: 0
   width: 100%
 </style>
-
-../map/settings/enum

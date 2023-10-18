@@ -9,8 +9,8 @@
           <div class="column">
             <div v-for="layer in bgl" :key="layer.NAME">
               <div class="col-3 col-sm-10 layer-column">
-                <q-btn :ref=layer.NAME round class="layer-roud-button" :class="{ 'active': selectedBackground[layer.NAME] }" @click="changeLayer(layer.NAME)">
-                  <q-avatar size=" 70px">
+                <q-btn :ref=layer.NAME round @click="changeLayer(layer.NAME)" class="layer-roud-button" :class="{ 'active': selectedBackground[layer.NAME] }">
+                  <q-avatar size="70px" class="layer-roud-avatar">
                     <img v-if="layer.TOKEN" :src="`${layer.IMG}access-token=${layer.TOKEN}`">
                     <img v-else :src="`${layer.IMG}`">
                   </q-avatar>
@@ -27,25 +27,31 @@
   </KeepAlive>
 </template>
 
-<script setup props lang="ts">
+<script setup lang="ts">
 
 import { ref } from 'vue';
 import { BACKGROUND_LAYERS_SETTINGS } from 'src/map/layers/enum';
-import { useMapStore } from 'src/stores/map-store';
+import { useMapStore } from '../stores/map-store'
 
 import type { Ref } from 'vue';
 import type { BackgroundLayerSettings } from 'src/map/layers/types';
 
-const { mapLayers } = defineProps({
-  mapLayers: Object
-});
-
 const activated: Ref<boolean> = ref(false);
 const bgl: Ref<BackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
-const selectedBackground: Ref<{[key: string]: boolean }> = ref({ OSM: true })
+const selectedBackground: Ref<{[key: string]: boolean }> = ref({ OSM: true });
+const mapStore = useMapStore()
 
+
+/**
+ * Fonction de changement des fonds de plan
+ * @param layer Nom de la couche à afficher
+ */
 function changeLayer(layer: string) {
-  mapLayers.tester(layer)
+  for (const background of Object.values(bgl.value)) {
+    mapStore.getLayerByName(background.NAME)?.setVisible(false)
+  }
+  mapStore.getLayerByName(layer)?.setVisible(true)
+  selectedBackground.value = { [layer] : true };
 }
 
 </script>
@@ -91,8 +97,13 @@ function changeLayer(layer: string) {
   align-items: center
 
 .layer-roud-button
-  margin: 3px
+  margin: 2px
+  box-shadow: 0 0 0 2px transparent
+  transition: box-shadow 0.4s ease
+
   &.active
-    margin: 0px
-    border: 3px solid $primary
+    box-shadow: 0 0 0 3px $primary
+
+.layer-roud-avatar
+  margin: 2px
 </style>

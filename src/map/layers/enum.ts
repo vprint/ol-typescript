@@ -11,7 +11,7 @@ export const BACKGROUND_LAYERS_SETTINGS: BackgroundLayerSettings = {
     ],
     TOKEN: HIDDEN_TOKEN.JAWGS.TOKEN,
     ZINDEX: 1,
-    VISIBLE: false
+    VISIBLE: true
   },
   JAWGMAPS_LIGHT: {
     NAME: 'Clair',
@@ -22,7 +22,7 @@ export const BACKGROUND_LAYERS_SETTINGS: BackgroundLayerSettings = {
     ],
     TOKEN: HIDDEN_TOKEN.JAWGS.TOKEN,
     ZINDEX: 1,
-    VISIBLE: true
+    VISIBLE: false
   },
   JAWGMAPS_DARK: {
     NAME: 'Sombre',

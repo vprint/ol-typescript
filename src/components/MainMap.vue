@@ -16,7 +16,7 @@ import MapLayers from '../map/layers/mapLayers'
 import { ref, onMounted } from 'vue';
 import type { Ref } from 'vue'
 import { useMapStore } from '../stores/map-store'
-import BackgroundTool from './BackgroundTool.vue';
+import BackgroundTool from './widgets/BackgroundTool.vue';
 
 const map: Ref<Map | undefined> = ref<Map>()
 const mapStore = useMapStore();

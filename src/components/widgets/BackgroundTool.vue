@@ -31,14 +31,14 @@
 
 import { ref } from 'vue';
 import { BACKGROUND_LAYERS_SETTINGS } from 'src/map/layers/enum';
-import { useMapStore } from '../stores/map-store'
+import { useMapStore } from '../../stores/map-store'
 
 import type { Ref } from 'vue';
 import type { BackgroundLayerSettings } from 'src/map/layers/types';
 
 const activated: Ref<boolean> = ref(false);
 const bgl: Ref<BackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
-const selectedBackground: Ref<{[key: string]: boolean }> = ref({ OSM: true });
+const selectedBackground: Ref<{[key: string]: boolean }> = ref({ Basique: true });
 const mapStore = useMapStore()
 
 

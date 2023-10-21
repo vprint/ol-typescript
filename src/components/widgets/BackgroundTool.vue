@@ -38,7 +38,7 @@ import type { BackgroundLayerSettings } from 'src/map/layers/types';
 
 const activated: Ref<boolean> = ref(false);
 const bgl: Ref<BackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
-const selectedBackground: Ref<{[key: string]: boolean }> = ref({ Basique: true });
+const selectedBackground: Ref<Record<string, boolean>> = ref({ Basique: true });
 const mapStore = useMapStore()
 
 
@@ -46,10 +46,10 @@ const mapStore = useMapStore()
  * Fonction de changement des fonds de plan
  * @param layer Nom de la couche à afficher
  */
-function changeLayer(layer: string) {
-  for (const background of Object.values(bgl.value)) {
+function changeLayer(layer: string): void {
+  Object.values(bgl.value).forEach(background => {
     mapStore.getLayerByName(background.NAME)?.setVisible(false)
-  }
+  })
   mapStore.getLayerByName(layer)?.setVisible(true)
   selectedBackground.value = { [layer] : true };
 }

@@ -3,6 +3,7 @@
     <q-page-container>
       <div id="map" class="map-container"></div>
     </q-page-container>
+    <widget-toolbar />
     <background-tool/>
   </q-layout>
 </template>
@@ -16,6 +17,7 @@ import MapLayers from '../map/layers/mapLayers'
 import { ref, onMounted } from 'vue';
 import type { Ref } from 'vue'
 import { useMapStore } from '../stores/map-store'
+import WidgetToolbar from './widgets/WidgetsToolbar/WidgetsToolbar.vue';
 import BackgroundTool from './widgets/BackgroundTool.vue';
 
 const map: Ref<Map | undefined> = ref<Map>()

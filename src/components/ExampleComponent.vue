@@ -22,10 +22,11 @@ import {
   Ref,
 } from 'vue';
 import { Todo, Meta } from './models';
+import { ComputedRef } from 'vue';
 
-function useClickCount() {
+function useClickCount(): { clickCount: Ref<number>; increment: () => number; } {
   const clickCount = ref(0);
-  function increment() {
+  function increment(): number {
     clickCount.value += 1
     return clickCount.value;
   }
@@ -33,7 +34,7 @@ function useClickCount() {
   return { clickCount, increment };
 }
 
-function useDisplayTodo(todos: Ref<Todo[]>) {
+function useDisplayTodo(todos: Ref<Todo[]>): { todoCount: ComputedRef<number>; } {
   const todoCount = computed(() => todos.value.length);
   return { todoCount };
 }

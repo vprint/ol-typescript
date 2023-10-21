@@ -76,7 +76,7 @@ class MapLayers {
   async addVectorTileLayers(): Promise<void> {
 
     // Requêtage des styles
-    const ArrayStyles: LayersStyles = await ApiRequestor.getStyles();
+    const ArrayStyles = await ApiRequestor.getStyles();
 
     // Style par défaut
     const defaultStyle: Style = new Style({
@@ -92,7 +92,7 @@ class MapLayers {
     // Itération sur les couches vectorielles tuilées
     for (const layer in VECTOR_TILE_LAYERS_SETTINGS) {
       const vtl = VECTOR_TILE_LAYERS_SETTINGS[layer]
-      const layerStyle = ArrayStyles[vtl.NAME]
+      const layerStyle = (ArrayStyles ? ArrayStyles[vtl.NAME] : null)
 
       // Création de la source
       const vectorTileSource = new VectorTileSource({
@@ -113,15 +113,9 @@ class MapLayers {
           },
           preload: Infinity,
           renderMode: 'hybrid',
-          style: function (feature) {
-            // Application des styles
-            if (layerStyle) {
-              return layerStyle[feature.get(vtl.TYPE_ID)];
-            }
-            // Si le style n'est pas disponible alors le style par défaut est retourné
-            else {
-              return defaultStyle
-            }
+          style: function (feature): Style {
+            // Application des styles. Si layerStyle est null alors le style par defaut est remonté.
+            return (layerStyle ? layerStyle[feature.get(vtl.TYPE_ID)] : defaultStyle)
           },
           visible: vtl.VISIBLE
         })

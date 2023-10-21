@@ -25,14 +25,10 @@ export const useMapStore = defineStore('map', {
    * @param name : nom de la couche à retourner
    */
     getLayerByName(name: string): BaseLayer | null {
-      if (this.$state._map != null) {
-        return this.$state._map
-          .getLayers()
-          .getArray()
-          .find((layer: BaseLayer) => layer.get('name') === name) as BaseLayer;
-      } else {
-        return null
-      }
+      return this.$state._map!
+        .getLayers()
+        .getArray()
+        .find((layer: BaseLayer) => layer.get('name') === name)! as BaseLayer;
     },
   }
 });

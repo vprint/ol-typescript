@@ -2,9 +2,7 @@
 export interface Token {
   TOKEN: string
 }
-export interface TokenSettings {
-  [tokenName: string]: Token
-}
+export type TokenSettings = Record<string, Token>
 
 
 
@@ -18,9 +16,7 @@ export interface BackgroundLayerType {
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export interface BackgroundLayerSettings {
-  [backgroundLayerName: string]: BackgroundLayerType;
-}
+export type BackgroundLayerSettings = Record<string, BackgroundLayerType>
 
 
 
@@ -34,9 +30,7 @@ export interface VectorTileLayerType {
   EDITABLE: boolean;
   TYPE_ID: string;
 }
-export interface VectorTileLayerSettings {
-  [vectorTileLayerName: string]: VectorTileLayerType
-}
+export type VectorTileLayerSettings = Record<string, VectorTileLayerType>
 
 
 
@@ -46,6 +40,4 @@ export interface VectorLayerType {
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export interface VectorLayerSettings {
-  [vectorLayerName: string]: VectorLayerType
-}
+export type VectorLayerSettings = Record<string, VectorLayerType>

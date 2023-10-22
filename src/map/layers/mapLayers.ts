@@ -8,7 +8,6 @@ import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile.js';
 import MVT from 'ol/format/MVT';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
-import { LayersStyles } from 'src/services/Api/types';
 import { Style, Fill, Stroke } from 'ol/style';
 
 /**

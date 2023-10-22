@@ -1,5 +1,5 @@
 <template>
-  <q-page-sticky @click="activated=!activated" position="bottom" class="q-px-md q-py-md ">
+  <q-page-sticky position="bottom" class="q-px-md q-py-md" @click="activated=!activated">
     <q-btn fab icon="mdi-layers" class="toolButton" :class="{ active: activated }"/>
   </q-page-sticky>
   <KeepAlive>
@@ -9,7 +9,7 @@
           <div class="column">
             <div v-for="layer in bgl" :key="layer.NAME">
               <div class="col-3 col-sm-10 layer-column">
-                <q-btn :ref=layer.NAME round @click="changeLayer(layer.NAME)" class="layer-roud-button" :class="{ 'active': selectedBackground[layer.NAME] }">
+                <q-btn :ref=layer.NAME round class="layer-roud-button" :class="{ 'active': selectedBackground[layer.NAME] }" @click="changeLayer(layer.NAME)">
                   <q-avatar size="70px" class="layer-roud-avatar">
                     <img v-if="layer.TOKEN" :src="`${layer.IMG}access-token=${layer.TOKEN}`">
                     <img v-else :src="`${layer.IMG}`">

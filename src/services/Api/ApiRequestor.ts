@@ -28,7 +28,7 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
 
 /**
 * Requête des styles.
-* @return {LayersStyles} The array of olStyle.
+* @return {LayersStyles | undefined} Array of olStyle or undefined.
 */
 async function getStyles(): Promise<LayersStyles | undefined> {
   // Requête style
@@ -39,8 +39,8 @@ async function getStyles(): Promise<LayersStyles | undefined> {
 
   const styleArray: LayersStyles = {}
 
-  if (!result) {
-    return undefined
+  if (result === undefined) {
+    undefined
   }
   else {
     result.forEach(style => {

@@ -9,7 +9,4 @@ export interface SqlStyles {
   'stroke_width': number,
   'layer_name': string
 }
-
-export interface LayersStyles {
-  [layerName: string]: Style[]
-}
+export type LayersStyles = Record<string, Style[]>

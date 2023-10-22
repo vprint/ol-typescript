@@ -7,6 +7,5 @@ export interface Widget {
   icon: string;
   tooltip: string;
 }
-export interface Widgets {
-  [widget: string]: Widget;
-}
+
+export type Widgets = Record<string, Widget>

@@ -2,10 +2,10 @@ import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile'
 import XYZ from 'ol/source/XYZ';
 import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS, DEFAULT_STYLE } from './enum'
-import VectorLayer from 'ol/layer/Vector.js';
+import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
-import VectorTileSource from 'ol/source/VectorTile.js';
+import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
 import { Style, Fill, Stroke } from 'ol/style';

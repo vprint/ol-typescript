@@ -64,11 +64,15 @@ import { toolbarWidgets } from './enum';
 import { useMapStore } from 'src/stores/map-store';
 import { easeOut } from 'ol/easing'
 import { View } from 'ol';
-import InformationTool from '../InformationTool.vue/InformationTool.vue';
+import InformationTool from '../InformationTool/InformationTool.vue';
+import { useWidgetStore } from 'src/stores/widgetStore/widget-store';
 
 const mapStore = useMapStore()
+const widgetStore = useWidgetStore()
 const widgets = ref(toolbarWidgets)
 const activeTool: Ref<string | null> = ref(null)
+
+console.log(widgetStore.widgetList)
 
 /**
  * Fonction de zoom
@@ -91,11 +95,9 @@ function zoom(value: number): void {
  * @param toolname nom du widget à activer / désactiver
  */
 function setWidget(toolname :string): void {
-  if (activeTool.value === toolname) {
-    activeTool.value = null
-  } else {
-    activeTool.value = toolname
-  }
+  // Vérifie si activateTool est égal au nom de l'outil en entré. Si oui, alors activateTool = null, sinon activateTool = toolname
+  activeTool.value === toolname ? activeTool.value = null : activeTool.value = toolname
+
 }
 
 </script>

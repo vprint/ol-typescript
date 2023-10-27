@@ -13,12 +13,14 @@ import { Map, View } from 'ol';
 import { fromLonLat } from 'ol/proj'
 import {MAP_SETTINGS } from '../map/settings/enum'
 import MapLayers from '../map/layers/mapLayers'
+import { useMapStore } from '../stores/mapStore/map-store'
 
 import { ref, onMounted } from 'vue';
 import type { Ref } from 'vue'
-import { useMapStore } from '../stores/mapStore/map-store'
+
+
 import WidgetToolbar from './widgets/WidgetsToolbar/WidgetsToolbar.vue';
-import BackgroundTool from './widgets/BackgroundTool.vue';
+import BackgroundTool from './widgets/BackgroundTool/BackgroundTool.vue';
 
 const map: Ref<Map | undefined> = ref<Map>()
 const mapStore = useMapStore();

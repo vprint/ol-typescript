@@ -31,7 +31,7 @@
 
 import { ref } from 'vue';
 import { BACKGROUND_LAYERS_SETTINGS } from 'src/map/layers/enum';
-import { useMapStore } from '../../stores/mapStore/map-store'
+import { useMapStore } from 'src/stores/mapStore/map-store'
 
 import type { Ref } from 'vue';
 import type { IBackgroundLayerSettings } from 'src/map/layers/types';
@@ -40,7 +40,6 @@ const open: Ref<boolean> = ref(false);
 const bgl: Ref<IBackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
 const selectedBackground: Ref<Record<string, boolean>> = ref({ Basique: true });
 const mapStore = useMapStore()
-
 
 /**
  * Fonction de changement des fonds de plan
@@ -53,7 +52,6 @@ function changeLayer(layer: string): void {
   mapStore.getLayerByName(layer)?.setVisible(true)
   selectedBackground.value = { [layer] : true };
 }
-
 </script>
 
 

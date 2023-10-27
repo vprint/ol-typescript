@@ -10,7 +10,7 @@
           :class="{'active': widget.title === activeTool}"
           @click="setWidget(widget.title)">
           <q-item-section avatar>
-            <q-icon :name=widget.icon />
+            <q-icon :name="widget.icon" />
           </q-item-section>
           <q-tooltip
             anchor="center right"
@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue'
+import { shallowRef, ref, Ref } from 'vue'
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { easeOut } from 'ol/easing'
 import { View } from 'ol';
@@ -73,7 +73,7 @@ import { useWidgetStore } from 'src/stores/widgetStore/widget-store';
 
 const mapStore = useMapStore()
 const widgetStore = useWidgetStore()
-const widgets = ref(widgetStore.widgetList)
+const widgets = shallowRef(widgetStore.widgetList)
 const activeTool: Ref<string | null> = ref(null)
 
 /**
@@ -108,7 +108,7 @@ function setWidget(toolname :string): void {
   display: flex
   overflow: hidden
 .sidebar
-  border: 1px solid rgba(0,0,0,0.2)
+  border: $borderDefault
   position: relative
   min-width: 55px
   width: 55px
@@ -125,7 +125,7 @@ function setWidget(toolname :string): void {
     background-color: $primary
 
 .content
-  border-top: 1px solid rgba(0,0,0,0.2)
-  border-right: 1px solid rgba(0,0,0,0.2)
-  border-bottom: 1px solid rgba(0,0,0,0.2)
+  border-top: $borderDefault
+  border-right: $borderDefault
+  border-bottom: $borderDefault
 </style>

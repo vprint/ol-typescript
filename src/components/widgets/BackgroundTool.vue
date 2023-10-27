@@ -1,9 +1,9 @@
 <template>
-  <q-page-sticky position="bottom" class="q-px-md q-py-md" @click="activated=!activated">
-    <q-btn fab icon="mdi-layers" class="toolButton" :class="{ active: activated }"/>
+  <q-page-sticky position="bottom" class="q-px-md q-py-md" @click="open=!open">
+    <q-btn fab icon="mdi-layers" class="toolButton" :class="{ active: open }"/>
   </q-page-sticky>
   <KeepAlive>
-    <q-card v-if="activated" square class="regular-card">
+    <q-card v-if="open" square class="regular-card">
       <q-card-section class="regular-section">
         <div class="q-pa-xs column-row-wrapping">
           <div class="column">
@@ -31,13 +31,13 @@
 
 import { ref } from 'vue';
 import { BACKGROUND_LAYERS_SETTINGS } from 'src/map/layers/enum';
-import { useMapStore } from '../../stores/map-store'
+import { useMapStore } from '../../stores/mapStore/map-store'
 
 import type { Ref } from 'vue';
-import type { BackgroundLayerSettings } from 'src/map/layers/types';
+import type { IBackgroundLayerSettings } from 'src/map/layers/types';
 
-const activated: Ref<boolean> = ref(false);
-const bgl: Ref<BackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
+const open: Ref<boolean> = ref(false);
+const bgl: Ref<IBackgroundLayerSettings> = ref(BACKGROUND_LAYERS_SETTINGS);
 const selectedBackground: Ref<Record<string, boolean>> = ref({ Basique: true });
 const mapStore = useMapStore()
 
@@ -100,10 +100,10 @@ function changeLayer(layer: string): void {
   margin: 2px
   box-shadow: 0 0 0 2px transparent
   transition: box-shadow 0.4s ease
-
   &.active
     box-shadow: 0 0 0 3px $primary
 
 .layer-roud-avatar
   margin: 2px
 </style>
+../../stores/mapStore/map-store

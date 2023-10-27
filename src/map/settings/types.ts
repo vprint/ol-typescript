@@ -1,4 +1,4 @@
-export interface mapSetting {
+export interface IMapSetting {
   CENTER: number[],
   ZOOM: number,
   MAXZOOM: number,

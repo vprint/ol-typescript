@@ -5,8 +5,9 @@
         <q-item
           v-for="widget in widgets"
           :key="widget.title"
-          :active="activeTool === widget.title"
           clickable
+          class="sidebar-items"
+          :class="{'active': widget.title === activeTool}"
           @click="setWidget(widget.title)">
           <q-item-section avatar>
             <q-icon :name=widget.icon />
@@ -52,27 +53,28 @@
         </q-item>
       </q-list>
     </div>
-    <div class="no-shadow">
-      <information-tool v-if="activeTool==='InformationTool'"/>
+    <div v-if="activeTool !== null" class="content no-shadow">
+      <keep-alive>
+        <component
+          :is="widgets[activeTool].tool"
+          :width="widgets[activeTool].width">
+        </component>
+      </keep-alive>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, Ref } from 'vue'
-import { toolbarWidgets } from './enum';
-import { useMapStore } from 'src/stores/map-store';
+import { useMapStore } from 'src/stores/mapStore/map-store';
 import { easeOut } from 'ol/easing'
 import { View } from 'ol';
-import InformationTool from '../InformationTool/InformationTool.vue';
 import { useWidgetStore } from 'src/stores/widgetStore/widget-store';
 
 const mapStore = useMapStore()
 const widgetStore = useWidgetStore()
-const widgets = ref(toolbarWidgets)
+const widgets = ref(widgetStore.widgetList)
 const activeTool: Ref<string | null> = ref(null)
-
-console.log(widgetStore.widgetList)
 
 /**
  * Fonction de zoom
@@ -95,9 +97,8 @@ function zoom(value: number): void {
  * @param toolname nom du widget à activer / désactiver
  */
 function setWidget(toolname :string): void {
-  // Vérifie si activateTool est égal au nom de l'outil en entré. Si oui, alors activateTool = null, sinon activateTool = toolname
+  // Vérifie si activeTool est égal au nom de l'outil en entré. Si oui, alors activeTool = null, sinon activeTool = toolname
   activeTool.value === toolname ? activeTool.value = null : activeTool.value = toolname
-
 }
 
 </script>
@@ -115,13 +116,16 @@ function setWidget(toolname :string): void {
   background-color: $secondary
   overflow: hidden
 .sidebar-items
-  color: $secondary
-  background-color: $primary
+  border: none
+  color: $primary
+  background-color: $secondary
   overflow: hidden
+  &.active
+    color: $secondary
+    background-color: $primary
+
 .content
-  border-width: 1px 0px 0px 0px
-  border-radius: 0
-  border-style: solid
-  border-color: rgba(0,0,0,0.2)
-  position: relative
+  border-top: 1px solid rgba(0,0,0,0.2)
+  border-right: 1px solid rgba(0,0,0,0.2)
+  border-bottom: 1px solid rgba(0,0,0,0.2)
 </style>

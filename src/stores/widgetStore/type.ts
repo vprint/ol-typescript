@@ -3,7 +3,7 @@ import { DefineComponent } from 'vue';
 /**
  * interface des widgets
  */
-export interface Widget {
+export interface IWidget {
   tool: DefineComponent,
   width: string;
   title: string;
@@ -11,4 +11,4 @@ export interface Widget {
   tooltip: string;
 }
 
-export type Widgets = Record<string, Widget>
+export type IWidgets = Record<string, IWidget>

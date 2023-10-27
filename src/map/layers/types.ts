@@ -1,13 +1,13 @@
 // Interface des tokens
-export interface Token {
+export interface IToken {
   TOKEN: string
 }
-export type TokenSettings = Record<string, Token>
+export type ITokenSettings = Record<string, IToken>
 
 
 
 // Interface des fonds de plan
-export interface BackgroundLayerType {
+export interface IBackgroundLayerType {
   NAME: string;
   URL: string;
   IMG: string;
@@ -16,12 +16,12 @@ export interface BackgroundLayerType {
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export type BackgroundLayerSettings = Record<string, BackgroundLayerType>
+export type IBackgroundLayerSettings = Record<string, IBackgroundLayerType>
 
 
 
 // Interface des tuiles vectorielles
-export interface VectorTileLayerType {
+export interface IVectorTileLayerType {
   NAME: string;
   ZINDEX: number;
   ATTRIBUTION?: string[];
@@ -30,14 +30,14 @@ export interface VectorTileLayerType {
   EDITABLE: boolean;
   TYPE_ID: string;
 }
-export type VectorTileLayerSettings = Record<string, VectorTileLayerType>
+export type IVectorTileLayerSettings = Record<string, IVectorTileLayerType>
 
 
 
 // Interface des couches vectorielles
-export interface VectorLayerType {
+export interface IVectorLayerType {
   NAME: string;
   ZINDEX: number;
   VISIBLE: boolean;
 }
-export type VectorLayerSettings = Record<string, VectorLayerType>
+export type IVectorLayerSettings = Record<string, IVectorLayerType>

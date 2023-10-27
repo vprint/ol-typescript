@@ -16,7 +16,7 @@ import MapLayers from '../map/layers/mapLayers'
 
 import { ref, onMounted } from 'vue';
 import type { Ref } from 'vue'
-import { useMapStore } from '../stores/map-store'
+import { useMapStore } from '../stores/mapStore/map-store'
 import WidgetToolbar from './widgets/WidgetsToolbar/WidgetsToolbar.vue';
 import BackgroundTool from './widgets/BackgroundTool.vue';
 
@@ -49,3 +49,4 @@ onMounted(()=>{
   bottom: 0
   width: 100%
 </style>
+../stores/mapStore/map-store

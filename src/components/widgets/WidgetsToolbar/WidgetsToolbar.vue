@@ -2,6 +2,7 @@
   <div class="q-pa-md">
     <div class="sidebar no-shadow">
       <q-list>
+
         <q-item
           v-for="widget in widgets"
           :key="widget.title"
@@ -22,7 +23,9 @@
             {{ widget.tooltip }}
           </q-tooltip>
         </q-item>
+
         <q-separator />
+
         <q-item clickable @click="zoom(1)">
           <q-item-section avatar>
             <q-icon name="sym_o_add" />
@@ -37,6 +40,7 @@
             {{ 'Zoom in' }}
           </q-tooltip>
         </q-item>
+
         <q-item clickable @click="zoom(-1)">
           <q-item-section avatar>
             <q-icon name="sym_o_remove" />
@@ -53,28 +57,33 @@
         </q-item>
       </q-list>
     </div>
-    <div v-if="activeTool !== null" class="content no-shadow">
+
+    <div class="content no-shadow">
       <keep-alive>
         <component
-          :is="widgets[activeTool].tool"
-          :width="widgets[activeTool].width">
+          :is="widgets[activeTool]?.tool"
+          :width="widgets[activeTool]?.width">
         </component>
       </keep-alive>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { shallowRef, ref, Ref } from 'vue'
+import {ref, Ref } from 'vue';
+
 import { useMapStore } from 'src/stores/mapStore/map-store';
-import { easeOut } from 'ol/easing'
-import { View } from 'ol';
 import { useWidgetStore } from 'src/stores/widgetStore/widget-store';
+
+import { easeOut } from 'ol/easing';
+import { View } from 'ol';
+
 
 const mapStore = useMapStore()
 const widgetStore = useWidgetStore()
-const widgets = shallowRef(widgetStore.widgetList)
-const activeTool: Ref<string | null> = ref(null)
+const widgets = widgetStore.widgetList
+const activeTool: Ref<string> = ref('')
 
 /**
  * Fonction de zoom
@@ -97,8 +106,8 @@ function zoom(value: number): void {
  * @param toolname nom du widget à activer / désactiver
  */
 function setWidget(toolname :string): void {
-  // Vérifie si activeTool est égal au nom de l'outil en entré. Si oui, alors activeTool = null, sinon activeTool = toolname
-  activeTool.value === toolname ? activeTool.value = null : activeTool.value = toolname
+  // Si le widget est actif alors il est desactivé. Sinon le widget change.
+  activeTool.value === toolname ? activeTool.value = '' : activeTool.value = toolname
 }
 
 </script>

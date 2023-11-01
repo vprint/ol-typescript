@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { toolbarWidgets } from './enum'
+import { toolbarWidgets } from './enum';
 
 export const useWidgetStore = defineStore('widget', {
   state: () => ({

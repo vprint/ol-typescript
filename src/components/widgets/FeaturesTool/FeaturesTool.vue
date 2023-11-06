@@ -73,6 +73,35 @@
         :disable="actionType === 'create'"
         class="merriweather">
         <p>Cliquer sur une entité pour la sélectionner.</p>
+        <q-stepper-navigation>
+          <div class="row justify-end">
+            <q-btn
+              square
+              flat
+              color="primary"
+              label="Retour"
+              class="q-ml-sm"
+              @click="setStep({toStep:1})" />
+            <q-btn
+              square
+              color="primary"
+              icon="done"
+              label="Continuer"
+              class="merriweather"
+              @click="setStep({toStep:4})"/>
+          </div>
+        </q-stepper-navigation>
+      </q-step>
+
+      <q-step
+        :name="4"
+        title="Attributs"
+        icon="view_headline"
+        class="merriweather">
+        <p>Modifier les informations attributaires</p>
+        <q-form class="q-gutter-md">
+          <q-select v-model="featureType" :options="typologys" label="Types" />
+        </q-form>
       </q-step>
 
     </q-stepper>
@@ -82,9 +111,12 @@
 <script setup lang="ts">
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
 import { ref, Ref } from 'vue';
+import ApiRequestor from 'src/services/Api/ApiRequestor';
 
 const step = ref(1)
 const actionType:Ref<string> = ref('')
+const featureType: Ref<string> = ref('yo')
+const typologys: Ref<string[]> = ref([])
 
 /**
  * Fonction de modification des étapes
@@ -95,4 +127,19 @@ function setStep({toStep, toActionType, toDrawMode}: {toStep: number, toActionTy
   step.value = toStep,
   toActionType ? actionType.value = toActionType : null
 }
+
+/**
+ * Fonction de récupération des noms des typologies
+ */
+async function set_typologys(): Promise<void> {
+  const result = await ApiRequestor.getTypologies()
+  if (result !== undefined) {
+    result.forEach(element => {
+      typologys.value.push(element.typology_name)
+    });
+  }
+}
+
+set_typologys()
+
 </script>

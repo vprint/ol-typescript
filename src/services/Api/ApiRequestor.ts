@@ -1,7 +1,7 @@
 import wretch from 'wretch'
 import { CONNECTION_PROPERTIES, USER_MESSAGE } from './enum'
 import Notifier from '../Notifier/Notifier'
-import { SqlStyles, LayersStyles } from './types'
+import { ISqlStyles, ILayersStyles, ITypologys } from './types'
 import { Fill, Stroke, Style } from 'ol/style';
 
 
@@ -30,17 +30,17 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
 * Requête des styles.
 * @return {LayersStyles | undefined} Array of olStyle or undefined.
 */
-async function getStyles(): Promise<LayersStyles | undefined> {
+async function getStyles(): Promise<ILayersStyles | undefined> {
   // Requête style
-  const result = await getJSON<SqlStyles[]>(
+  const result = await getJSON<ISqlStyles[]>(
     `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_styles/items`,
     USER_MESSAGE.STYLE_ERROR,
   );
 
-  const styleArray: LayersStyles = {}
+  const styleArray: ILayersStyles = {}
 
   if (result === undefined) {
-    undefined
+    return undefined
   }
   else {
     result.forEach(style => {
@@ -66,8 +66,21 @@ async function getStyles(): Promise<LayersStyles | undefined> {
   }
 }
 
+/**
+ * Fonction de requêtage des typologies
+ */
+async function getTypologies(): Promise<ITypologys | undefined> {
+  // Requête typologies
+  const result = await getJSON<ITypologys>(
+    `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_typology/items`,
+    USER_MESSAGE.TYPOLOGY_ERROR,
+  );
+  return result !== undefined ? result : undefined
+}
+
 const ApiRequestor = {
-  getStyles
+  getStyles,
+  getTypologies
 };
 
 export default ApiRequestor;

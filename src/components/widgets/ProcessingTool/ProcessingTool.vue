@@ -2,6 +2,6 @@
   <RegularWidget title="Processing"></RegularWidget>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
 </script>

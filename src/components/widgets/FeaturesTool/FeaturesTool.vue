@@ -118,6 +118,8 @@ const actionType:Ref<string> = ref('')
 const featureType: Ref<string> = ref('yo')
 const typologys: Ref<string[]> = ref([])
 
+set_typologys()
+
 /**
  * Fonction de modification des étapes
  * @param toStep Etape cible
@@ -129,7 +131,7 @@ function setStep({toStep, toActionType, toDrawMode}: {toStep: number, toActionTy
 }
 
 /**
- * Fonction de récupération des noms des typologies
+ * Fonction de récupération et de défintion des noms des typologies
  */
 async function set_typologys(): Promise<void> {
   const result = await ApiRequestor.getTypologies()
@@ -140,6 +142,5 @@ async function set_typologys(): Promise<void> {
   }
 }
 
-set_typologys()
 
 </script>

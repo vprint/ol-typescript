@@ -69,7 +69,7 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
 /**
  * Fonction de requêtage des typologies
  */
-async function getTypologies(): Promise<ITypologys | undefined> {
+async function getTypologys(): Promise<ITypologys | undefined> {
   // Requête typologies
   const result = await getJSON<ITypologys>(
     `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_typology/items`,
@@ -80,7 +80,7 @@ async function getTypologies(): Promise<ITypologys | undefined> {
 
 const ApiRequestor = {
   getStyles,
-  getTypologies
+  getTypologys
 };
 
 export default ApiRequestor;

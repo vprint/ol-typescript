@@ -112,13 +112,14 @@
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
 import { ref, Ref } from 'vue';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
+import { ITypologys } from 'src/services/Api/types';
 
 const step = ref(1)
-const actionType:Ref<string> = ref('')
+const actionType: Ref<string> = ref('')
 const featureType: Ref<string> = ref('yo')
 const typologys: Ref<string[]> = ref([])
 
-set_typologys()
+getTypologys()
 
 /**
  * Fonction de modification des étapes
@@ -133,14 +134,17 @@ function setStep({toStep, toActionType, toDrawMode}: {toStep: number, toActionTy
 /**
  * Fonction de récupération et de défintion des noms des typologies
  */
-async function set_typologys(): Promise<void> {
-  const result = await ApiRequestor.getTypologies()
+async function getTypologys(): Promise<void> {
+  const result = await ApiRequestor.getTypologys()
   if (result !== undefined) {
-    result.forEach(element => {
-      typologys.value.push(element.typology_name)
-    });
+    setTypologys(result)
   }
 }
 
+function setTypologys(typologies: ITypologys): void {
+  typologies.forEach(element => {
+    typologys.value.push(element.typology_name)
+  })
+}
 
 </script>

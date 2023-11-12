@@ -20,5 +20,6 @@ export const USER_MESSAGE = {
   ERROR: 'Erreur de requête',
   STYLE_ERROR: 'Erreur lors de la récupération des styles',
   TYPOLOGY_ERROR: 'Erreur lors de la récupération des types',
+  BBOX_ERROR: 'Erreur lors de la récupération des BBOX',
   SERVER_ERROR: 'Erreur lors de la requête sur le serveur de données',
 };

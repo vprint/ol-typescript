@@ -1,8 +1,9 @@
-import wretch from 'wretch'
-import { CONNECTION_PROPERTIES, USER_MESSAGE } from './enum'
-import Notifier from '../Notifier/Notifier'
-import { ISqlStyles, ILayersStyles, ITypologys } from './types'
+import wretch from 'wretch';
+import { CONNECTION_PROPERTIES, USER_MESSAGE } from './enum';
+import Notifier from '../Notifier/Notifier';
+import { ISqlStyles, ILayersStyles, ITypologies } from './types';
 import { Fill, Stroke, Style } from 'ol/style';
+import { FeatureCollection } from 'geojson';
 
 
 /**
@@ -69,18 +70,33 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
 /**
  * Fonction de requêtage des typologies
  */
-async function getTypologys(): Promise<ITypologys | undefined> {
+async function getTypologies(): Promise<ITypologies | undefined> {
   // Requête typologies
-  const result = await getJSON<ITypologys>(
+  const result = await getJSON<ITypologies>(
     `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_typology/items`,
     USER_MESSAGE.TYPOLOGY_ERROR,
   );
-  return result !== undefined ? result : undefined
+  return result
+}
+
+
+/**
+ * Fonction de requêtage des bbox
+ * @param ids Liste des ID des features
+ * @returns
+ */
+async function getBBox(ids: string[]): Promise<FeatureCollection | undefined> {
+  const result = await getJSON<FeatureCollection>(
+    `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_bbox/items?ids=${ids}`,
+    USER_MESSAGE.BBOX_ERROR,
+  )
+  return result;
 }
 
 const ApiRequestor = {
   getStyles,
-  getTypologys
+  getTypologies,
+  getBBox
 };
 
 export default ApiRequestor;

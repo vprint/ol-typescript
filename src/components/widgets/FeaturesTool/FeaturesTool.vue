@@ -74,22 +74,7 @@
         class="merriweather">
         <p>Cliquer sur une entité pour la sélectionner.</p>
         <q-stepper-navigation>
-          <div class="row justify-end">
-            <q-btn
-              square
-              flat
-              color="primary"
-              label="Retour"
-              class="q-ml-sm"
-              @click="setStep({toStep:1})" />
-            <q-btn
-              square
-              color="primary"
-              icon="done"
-              label="Continuer"
-              class="merriweather"
-              @click="setStep({toStep:4})"/>
-          </div>
+          <feature-selector @selector-next="enableModification" @selector-back="setStep({toStep: 1})" />
         </q-stepper-navigation>
       </q-step>
 
@@ -100,7 +85,7 @@
         class="merriweather">
         <p>Modifier les informations attributaires</p>
         <q-form class="q-gutter-md">
-          <q-select v-model="featureType" :options="typologys" label="Types" />
+          <q-select v-model="featureType" :options="typologiesName" label="Types" />
         </q-form>
       </q-step>
 
@@ -110,16 +95,18 @@
 
 <script setup lang="ts">
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
+import featureSelector from '../FeatureSelector/FeatureSelector.vue';
 import { ref, Ref } from 'vue';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
-import { ITypologys } from 'src/services/Api/types';
+import { ITypologies } from 'src/services/Api/types';
 
 const step = ref(1)
 const actionType: Ref<string> = ref('')
 const featureType: Ref<string> = ref('yo')
-const typologys: Ref<string[]> = ref([])
+const typologiesRaw = ApiRequestor.getTypologies()
+const typologiesName: Ref<string[]> = ref([])
 
-getTypologys()
+setTypologies(typologiesRaw)
 
 /**
  * Fonction de modification des étapes
@@ -132,19 +119,27 @@ function setStep({toStep, toActionType, toDrawMode}: {toStep: number, toActionTy
 }
 
 /**
- * Fonction de récupération et de défintion des noms des typologies
+ * Définition du nom des typologies pour la liste de sélection
+ * @param typologies Liste des typologies
  */
-async function getTypologys(): Promise<void> {
-  const result = await ApiRequestor.getTypologys()
-  if (result !== undefined) {
-    setTypologys(result)
+async function setTypologies(typologyPromise: Promise<ITypologies | undefined>): Promise<void> {
+  const typologyList = await typologyPromise
+  if (typologyList !== undefined) {
+    typologyList.forEach(element => {
+      typologiesName.value.push(element.typology_name)
+    })
   }
 }
 
-function setTypologys(typologies: ITypologys): void {
-  typologies.forEach(element => {
-    typologys.value.push(element.typology_name)
-  })
+function enableModification(): void {
+  console.log('activation')
+}
+
+/**
+ * Fonction de réinitialisation du composant
+ */
+function reset(): void {
+  actionType.value = ''
 }
 
 </script>

@@ -19,4 +19,4 @@ export interface ISqlTypologies {
   id_typology: number,
   geom_type: string
 }
-export type ITypologys = ISqlTypologies[]
+export type ITypologies = ISqlTypologies[]

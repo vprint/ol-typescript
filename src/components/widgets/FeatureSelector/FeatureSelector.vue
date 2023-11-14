@@ -1,5 +1,6 @@
 <template>
   <q-table
+    v-if="features.length > 0"
     ref="fTable"
     v-model:selected="selectedFeature"
     style="max-height: 400px"
@@ -34,10 +35,14 @@
         @click="next" />
     </template>
   </q-table>
+  <p
+    v-else>
+    Cliquer sur une entité pour la sélectionner
+  </p>
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { Ref, ref, onDeactivated, onActivated, onUnmounted } from 'vue';
 import { QTable, QTableProps } from 'quasar';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { FeatureLike } from 'ol/Feature';
@@ -50,6 +55,7 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { easeOut } from 'ol/easing';
 import { Stroke, Fill, Style } from 'ol/style';
 import VectorTileLayer from 'ol/layer/VectorTile'
+import Notifier from 'src/services/Notifier/Notifier';
 
 let typologiesTable: Record<number, string> = {}
 let selectedId: string | number | undefined = ''
@@ -59,7 +65,7 @@ let fTable: QTable
 
 const mapStore = useMapStore()
 const editionLayer = mapStore.getLayerByName('Features_edition') as VectorTileLayer
-const selectedFeature = ref([])
+const selectedFeature: Ref<FeatureLike[]> = ref([])
 const features: Ref<FeatureLike[]> = ref([])
 const columns: QTableProps['columns'] = [
   {
@@ -109,16 +115,24 @@ async function formatTypologies(): Promise<void> {
  * @param e Type d'événement
  */
 const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
-  fTable.clearSelection()
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  fTable ? fTable.clearSelection() : null
   const mapFeatures = mapStore.map?.getFeaturesAtPixel(e.pixel, {
     hitTolerance: 5,
     layerFilter: (layer) => layer.get('name') === VECTOR_TILE_LAYERS_SETTINGS.CARTOGRAPHY_LAYER.NAME
   })
+  if (mapFeatures?.length === 0) {
+    Notifier.push({
+      mode: 'warning',
+      text: 'Aucune entité trouvé à l\'endroit cliqué',
+      title: 'Aucune géométrie remontée'
+    })
+  }
   features.value = mapFeatures ? mapFeatures : []
   selectedIds = mapFeatures ? mapFeatures.map(feature => feature.getId() as string) : []
-  featuresBBox = await ApiRequestor.getBBox(selectedIds)
   editionLayer.setVisible(true)
   editionLayer.setStyle(selectionFeatureStyle)
+  featuresBBox = await ApiRequestor.getBBox(selectedIds)
 }
 
 
@@ -129,21 +143,25 @@ const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
  * @param selected Ligne selectionnée
  */
 function onRowSelection(selected: ISelected): void {
-  if (featuresBBox !== undefined) {
-    selectedId = selected.rows[0].getId()
-    const rawExtent = featuresBBox.features.find(feature => feature.id === selectedId)
-    const bbox = new GeoJSON().readGeometry(rawExtent?.geometry, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857'
-    })
-    mapStore.map?.getView().fit(bbox.getExtent(), {
-      padding: [50, 50, 50, 600],
-      maxZoom: 17,
-      duration: 250,
-      easing: easeOut
-    })
-    editionLayer.setVisible(true)
-    editionLayer.setStyle(selectedFeatureStyle)
+  if (selected.added) {
+    if (featuresBBox !== undefined) {
+      selectedId = selected.rows[0].getId()
+      const rawExtent = featuresBBox.features.find(feature => feature.id === selectedId)
+      const bbox = new GeoJSON().readGeometry(rawExtent?.geometry, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      })
+      mapStore.map?.getView().fit(bbox.getExtent(), {
+        padding: [50, 50, 50, 600],
+        maxZoom: 17,
+        duration: 250,
+        easing: easeOut
+      })
+      editionLayer.setVisible(true)
+      editionLayer.setStyle(selectedFeatureStyle)
+    }
+  } else {
+    editionLayer.setStyle(selectionFeatureStyle)
   }
 }
 
@@ -171,28 +189,39 @@ function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
 
 
 /**
- * Fonction de réinitialisation
- */
-function reset(): void {
-  selectedFeature.value = []
-}
-
-
-/**
  * Fonction de retour à l'étape précéddente
  */
  function back(): void {
   emit('selectorBack')
 }
 
-
 /**
  * Fonction de passage à l'étape suivante
  */
 function next(): void {
-  emit('selectorNext')
+  emit('selectorNext', selectedFeature.value)
 }
 
+/**
+ * Gestion de la desactivation du composant
+ */
+onDeactivated(() => {
+  mapStore.map?.un('click', selector);
+});
+
+/**
+ * Gestion de l'activation du composant
+ */
+onActivated(() => {
+  mapStore.map?.on('click', selector);
+});
+
+/**
+ * Gestion de la destruction du widget
+ */
+onUnmounted(() => {
+  mapStore.map?.un('click', selector);
+});
 
 formatTypologies()
 mapStore.map?.on('click', selector)

@@ -72,7 +72,6 @@
         :done="step > 3"
         :disable="actionType === 'create'"
         class="merriweather">
-        <p>Cliquer sur une entité pour la sélectionner.</p>
         <q-stepper-navigation>
           <feature-selector @selector-next="enableModification" @selector-back="setStep({toStep: 1})" />
         </q-stepper-navigation>

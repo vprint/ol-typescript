@@ -8,7 +8,7 @@ import { DefineComponent, markRaw } from 'vue'
 export const toolbarWidgets: IWidgets = {
   FeaturesTool: {
     tool: markRaw(FeaturesTool) as DefineComponent,
-    width: '450px',
+    width: '500px',
     title: 'FeaturesTool',
     icon: 'mdi-map',
     tooltip: 'Features'

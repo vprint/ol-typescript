@@ -1,6 +1,8 @@
 <template>
   <q-table
+    ref="fTable"
     v-model:selected="selectedFeature"
+    style="max-height: 400px"
     flat
     bordered
     square
@@ -9,7 +11,9 @@
     :columns="columns"
     row-key="id_"
     selection="single"
-    class="shadow-4"
+    virtual-scroll
+    class="no-shadow"
+    :rows-per-page-options="[0]"
     @selection="onRowSelection">
     <template #bottom>
       <q-space />
@@ -30,12 +34,11 @@
         @click="next" />
     </template>
   </q-table>
-  <!--TODO: Ecrire un double bas de page (pagination + boutons)-->
 </template>
 
 <script setup lang="ts">
 import { Ref, ref } from 'vue';
-import { QTableProps } from 'quasar';
+import { QTable, QTableProps } from 'quasar';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { FeatureLike } from 'ol/Feature';
 import { VECTOR_TILE_LAYERS_SETTINGS } from 'src/map/layers/enum';
@@ -45,12 +48,17 @@ import { FeatureCollection } from 'geojson';
 import { ISelected } from './types';
 import GeoJSON from 'ol/format/GeoJSON'
 import { easeOut } from 'ol/easing';
+import { Stroke, Fill, Style } from 'ol/style';
+import VectorTileLayer from 'ol/layer/VectorTile'
 
 let typologiesTable: Record<number, string> = {}
+let selectedId: string | number | undefined = ''
 let selectedIds: string[] = [];
 let featuresBBox: FeatureCollection | undefined
+let fTable: QTable
 
 const mapStore = useMapStore()
+const editionLayer = mapStore.getLayerByName('Features_edition') as VectorTileLayer
 const selectedFeature = ref([])
 const features: Ref<FeatureLike[]> = ref([])
 const columns: QTableProps['columns'] = [
@@ -69,10 +77,19 @@ const columns: QTableProps['columns'] = [
     field: 'id_',
   }
 ]
+const selectionStyle = new Style({
+  stroke: new Stroke({
+    color: 'rgba(220,50,225,1)',
+    width: 4,
+  }),
+  fill: new Fill({
+    color: 'rgba(220,50,225,0)',
+  }),
+})
+
 
 const emit = defineEmits(['selectorBack', 'selectorNext'])
 
-formatTypologies()
 
 /**
  * Fonction de récupération et de formatage des typologies
@@ -86,11 +103,13 @@ async function formatTypologies(): Promise<void> {
   }
 }
 
+
 /**
  * Fonction de gestion des sélections selon un événement (dans notre cas, ils'agit d'un clic)
  * @param e Type d'événement
  */
 const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
+  fTable.clearSelection()
   const mapFeatures = mapStore.map?.getFeaturesAtPixel(e.pixel, {
     hitTolerance: 5,
     layerFilter: (layer) => layer.get('name') === VECTOR_TILE_LAYERS_SETTINGS.CARTOGRAPHY_LAYER.NAME
@@ -98,14 +117,20 @@ const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
   features.value = mapFeatures ? mapFeatures : []
   selectedIds = mapFeatures ? mapFeatures.map(feature => feature.getId() as string) : []
   featuresBBox = await ApiRequestor.getBBox(selectedIds)
+  editionLayer.setVisible(true)
+  editionLayer.setStyle(selectionFeatureStyle)
 }
 
-// Activation de la selection lors d'un clic
-mapStore.map?.on('click', selector)
 
+/**
+ * Fonction de gestion de la sélection.
+ * 1) Effectue un zoom sur la géométrie sélectionnée
+ * 2) Modifie le style de la feature
+ * @param selected Ligne selectionnée
+ */
 function onRowSelection(selected: ISelected): void {
   if (featuresBBox !== undefined) {
-    const selectedId = selected.rows[0].getId()
+    selectedId = selected.rows[0].getId()
     const rawExtent = featuresBBox.features.find(feature => feature.id === selectedId)
     const bbox = new GeoJSON().readGeometry(rawExtent?.geometry, {
       dataProjection: 'EPSG:4326',
@@ -114,11 +139,44 @@ function onRowSelection(selected: ISelected): void {
     mapStore.map?.getView().fit(bbox.getExtent(), {
       padding: [50, 50, 50, 600],
       maxZoom: 17,
-      duration: 1000,
+      duration: 250,
       easing: easeOut
     })
+    editionLayer.setVisible(true)
+    editionLayer.setStyle(selectedFeatureStyle)
   }
 }
+
+
+/**
+ * Stylisation pour la sélection du tableau globale
+ * @param feature
+ */
+function selectionFeatureStyle(feature: FeatureLike): Style | undefined {
+  if (selectedIds.includes(feature.getId() as string)) {
+    return selectionStyle;
+  }
+}
+
+
+/**
+ * Stylisation pour les features sélectionnées dans le tableau
+ * @param feature
+ */
+function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
+  if (selectedId === feature.getId()) {
+    return selectionStyle;
+  }
+}
+
+
+/**
+ * Fonction de réinitialisation
+ */
+function reset(): void {
+  selectedFeature.value = []
+}
+
 
 /**
  * Fonction de retour à l'étape précéddente
@@ -127,11 +185,16 @@ function onRowSelection(selected: ISelected): void {
   emit('selectorBack')
 }
 
+
 /**
  * Fonction de passage à l'étape suivante
  */
 function next(): void {
   emit('selectorNext')
 }
+
+
+formatTypologies()
+mapStore.map?.on('click', selector)
 
 </script>

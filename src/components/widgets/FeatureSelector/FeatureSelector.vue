@@ -59,12 +59,12 @@ import Notifier from 'src/services/Notifier/Notifier';
 
 let typologiesTable: Record<number, string> = {}
 let selectedId: string | number | undefined = ''
-let selectedIds: string[] = [];
+let selectedIds: (string | number | undefined)[] = [];
 let featuresBBox: FeatureCollection | undefined
 let fTable: QTable
 
 const mapStore = useMapStore()
-const editionLayer = mapStore.getLayerByName('Features_edition') as VectorTileLayer
+const selectionLayer = mapStore.getLayerByName('Features_selection') as VectorTileLayer
 const selectedFeature: Ref<FeatureLike[]> = ref([])
 const features: Ref<FeatureLike[]> = ref([])
 const columns: QTableProps['columns'] = [
@@ -129,9 +129,9 @@ const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
     })
   }
   features.value = mapFeatures ? mapFeatures : []
-  selectedIds = mapFeatures ? mapFeatures.map(feature => feature.getId() as string) : []
-  editionLayer.setVisible(true)
-  editionLayer.setStyle(selectionFeatureStyle)
+  selectedIds = mapFeatures ? mapFeatures.map(feature => feature.getId()) : []
+  selectionLayer.setVisible(true)
+  selectionLayer.setStyle(selectionFeatureStyle)
   featuresBBox = await ApiRequestor.getBBox(selectedIds)
 }
 
@@ -157,11 +157,11 @@ function onRowSelection(selected: ISelected): void {
         duration: 250,
         easing: easeOut
       })
-      editionLayer.setVisible(true)
-      editionLayer.setStyle(selectedFeatureStyle)
+      selectionLayer.setVisible(true)
+      selectionLayer.setStyle(selectedFeatureStyle)
     }
   } else {
-    editionLayer.setStyle(selectionFeatureStyle)
+    selectionLayer.setStyle(selectionFeatureStyle)
   }
 }
 
@@ -199,7 +199,7 @@ function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
  * Fonction de passage à l'étape suivante
  */
 function next(): void {
-  emit('selectorNext', selectedFeature.value)
+  emit('selectorNext', selectedFeature.value[0])
 }
 
 /**
@@ -207,6 +207,7 @@ function next(): void {
  */
 onDeactivated(() => {
   mapStore.map?.un('click', selector);
+  selectionLayer.setVisible(false);
 });
 
 /**
@@ -214,6 +215,7 @@ onDeactivated(() => {
  */
 onActivated(() => {
   mapStore.map?.on('click', selector);
+  selectionLayer.setVisible(true);
 });
 
 /**
@@ -221,6 +223,7 @@ onActivated(() => {
  */
 onUnmounted(() => {
   mapStore.map?.un('click', selector);
+  selectionLayer.setVisible(false);
 });
 
 formatTypologies()

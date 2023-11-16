@@ -27,7 +27,7 @@ export interface IVectorTileLayerType {
   ATTRIBUTION?: string[];
   VISIBLE: boolean;
   URL?: string;
-  EDITABLE: boolean;
+  SELECTIONABLE: boolean;
   TYPE_ID: string;
 }
 export type IVectorTileLayerSettings = Record<string, IVectorTileLayerType>

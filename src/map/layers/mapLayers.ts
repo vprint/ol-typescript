@@ -112,8 +112,8 @@ class MapLayers {
           },
           preload: Infinity,
           renderMode: 'hybrid',
+          // Application des styles. Si layerStyle est null alors le style par defaut est remonté.
           style: function (feature): Style {
-            // Application des styles. Si layerStyle est null alors le style par defaut est remonté.
             return (layerStyle ? layerStyle[feature.get(vtl.TYPE_ID)] : defaultStyle)
           },
           visible: vtl.VISIBLE
@@ -121,13 +121,13 @@ class MapLayers {
       )
 
       // Ajout de la couche d'édition
-      if (vtl.EDITABLE) {
+      if (vtl.SELECTIONABLE) {
         this.map.addLayer(
           new VectorTileLayer({
             source: vectorTileSource,
             zIndex: vtl.ZINDEX + 1,
             properties: {
-              'name': `${vtl.NAME}_edition`
+              'name': `${vtl.NAME}_selection`
             },
             preload: Infinity,
             renderMode: 'vector',

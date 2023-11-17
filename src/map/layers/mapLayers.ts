@@ -61,7 +61,8 @@ class MapLayers {
           zIndex: vl.ZINDEX,
           visible: vl.VISIBLE,
           properties: {
-            'name': vl.NAME
+            'name': vl.NAME,
+            'selectionnable': vl.SELECTIONNABLE
           },
 
         })
@@ -109,6 +110,7 @@ class MapLayers {
           zIndex: vtl.ZINDEX,
           properties: {
             'name': vtl.NAME,
+            'selectionnable': vtl.SELECTIONNABLE
           },
           preload: Infinity,
           renderMode: 'hybrid',
@@ -121,13 +123,14 @@ class MapLayers {
       )
 
       // Ajout de la couche d'édition
-      if (vtl.SELECTIONABLE) {
+      if (vtl.SELECTIONNABLE) {
         this.map.addLayer(
           new VectorTileLayer({
             source: vectorTileSource,
             zIndex: vtl.ZINDEX + 1,
             properties: {
-              'name': `${vtl.NAME}_selection`
+              'name': `${vtl.NAME}_selection`,
+              'selectionnable': false
             },
             preload: Infinity,
             renderMode: 'vector',

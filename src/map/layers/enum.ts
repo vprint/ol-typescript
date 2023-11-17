@@ -53,7 +53,7 @@ export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
     NAME: 'Features',
     VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
-    SELECTIONABLE: true,
+    SELECTIONNABLE: true,
     TYPE_ID: 'id_typology'
   },
 }
@@ -62,6 +62,7 @@ export const VECTOR_LAYERS_SETTINGS: IVectorLayerSettings = {
   EDITION_LAYER: {
     ZINDEX: 4,
     NAME: 'Edition',
+    SELECTIONNABLE: false,
     VISIBLE: false
   },
 }

@@ -119,12 +119,12 @@ const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
   fTable ? fTable.clearSelection() : null
   const mapFeatures = mapStore.map?.getFeaturesAtPixel(e.pixel, {
     hitTolerance: 5,
-    layerFilter: (layer) => layer.get('name') === VECTOR_TILE_LAYERS_SETTINGS.CARTOGRAPHY_LAYER.NAME
+    layerFilter: (layer) => layer.get('selectionnable') === true
   })
   if (mapFeatures?.length === 0) {
     Notifier.push({
       mode: 'warning',
-      text: 'Aucune entité trouvé à l\'endroit cliqué',
+      text: 'Aucune entité trouvée',
       title: 'Aucune géométrie remontée'
     })
   }

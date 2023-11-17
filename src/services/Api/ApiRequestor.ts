@@ -4,6 +4,8 @@ import Notifier from '../Notifier/Notifier';
 import { ISqlStyles, ILayersStyles, ITypologies } from './types';
 import { Fill, Stroke, Style } from 'ol/style';
 import { FeatureCollection } from 'geojson';
+import GeoJSON from 'ol/format/GeoJSON';
+import { Feature } from 'ol';
 
 
 /**
@@ -20,9 +22,9 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
         mode: 'error',
         text: errorMsg,
         title: USER_MESSAGE.ERROR
-      })
+      });
       return undefined
-    })
+    });
   return response as Promise<T | undefined>
 }
 
@@ -60,12 +62,13 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
         }),
         fill: new Fill({
           color: style.fill_color ?? 'transparent'
-        }),
-      })
-    })
+        })
+      });
+    });
     return styleArray;
   }
 }
+
 
 /**
  * Fonction de requêtage des typologies
@@ -85,18 +88,38 @@ async function getTypologies(): Promise<ITypologies | undefined> {
  * @param ids Liste des ID des features
  * @returns
  */
-async function getBBox(ids: string[]): Promise<FeatureCollection | undefined> {
+async function getBBox(ids: (string | number | undefined)[]): Promise<FeatureCollection | undefined> {
+  const idsAsString = ids.toString();
+  const encodedIds = encodeURIComponent(idsAsString);
   const result = await getJSON<FeatureCollection>(
-    `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_bbox/items?ids=${ids}`,
+    `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_bbox/items?ids=${encodedIds}`,
     USER_MESSAGE.BBOX_ERROR,
-  )
+  );
   return result;
+}
+
+/**
+ * Fonction de requêtage d'entité par Id
+ * @param id Id de l'entité
+ * @returns Feature
+ */
+async function getFeatureById(id: string): Promise<Feature | undefined> {
+  const result = await getJSON<FeatureCollection>(
+    `${CONNECTION_PROPERTIES.FeatureServer.Collections}carto.td_features/items?id=${id}`,
+    USER_MESSAGE.FEATURE_ERROR,
+  );
+  const feature = new GeoJSON().readFeature(result?.features[0], {
+    dataProjection: 'EPSG:4326',
+    featureProjection: 'EPSG:3857'
+  });
+  return feature;
 }
 
 const ApiRequestor = {
   getStyles,
   getTypologies,
-  getBBox
+  getBBox,
+  getFeatureById
 };
 
 export default ApiRequestor;

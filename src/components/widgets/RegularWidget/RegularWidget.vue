@@ -1,8 +1,18 @@
 <template>
-  <div class="merriweather regular-header no-shadow" :style="{ width: width }">{{ title }}</div>
-  <q-card class="regular-card no-shadow" :style="{ maxWidth: width }">
-    <slot></slot>
-  </q-card>
+  <div class="global">
+    <div>
+      <div class="merriweather regular-header no-shadow" :style="{ width: width }">
+        <slot name="header">{{ title }}</slot>
+      </div>
+      <q-card class="regular-card no-shadow" :style="{ maxWidth: width }">
+        <slot name="component"></slot>
+      </q-card>
+    </div>
+
+    <div class="q-pl-md">
+      <slot name="external"></slot>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts" >
@@ -13,7 +23,7 @@ defineProps({
   },
   width: {
     type: String,
-    default: '500px'
+    default: '400px'
   }
 })
 </script>
@@ -28,6 +38,7 @@ defineProps({
   padding: 0px 0
   height: calc(100vh - 100px)
   overflow: auto
+
 .regular-header
   background-color: $primary
   color: $secondary
@@ -42,4 +53,7 @@ defineProps({
   display: flex
   align-items: center
   justify-content: center
+
+.global
+  display: flex
 </style>

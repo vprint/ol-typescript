@@ -222,8 +222,11 @@ onActivated(() => {
  * Gestion de la destruction du widget
  */
 onUnmounted(() => {
+  selectedIds = []
+  selectedId = ''
   mapStore.map?.un('click', selector);
   selectionLayer.setVisible(false);
+  selectionLayer.getSource()?.refresh()
 });
 
 formatTypologies()

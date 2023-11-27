@@ -13,17 +13,17 @@ export const useMapStore = defineStore('map', {
 
   actions: {
     /**
-     * Initialisation de la carte.
-     * @param map : ol map
+     * Définition de la carte de travail.
+     * @param map : Carte de travail
      */
     async setMap(map: Map): Promise<void> {
       this._map = map;
     },
 
     /**
-   * Fonction de recherche de couche.
-   * @param name : nom de la couche à retourner
-   */
+    * Fonction de recherche de couche.
+    * @param name : nom de la couche à retourner
+    */
     getLayerByName(name: string): BaseLayer | null {
       return this.$state._map!
         .getLayers()

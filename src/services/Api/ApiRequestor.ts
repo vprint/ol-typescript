@@ -6,7 +6,8 @@ import { Fill, Stroke, Style } from 'ol/style';
 import { FeatureCollection } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Feature } from 'ol';
-
+import { TransactionMode } from '../TransactionServices/type';
+import TransactionServices from '../TransactionServices/TransactionServices';
 
 /**
  * Fonction de requêtage des JSON.
@@ -25,7 +26,27 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
       });
       return undefined
     });
-  return response as Promise<T | undefined>
+  return response
+}
+
+/**
+ * Fonction de postage des JSON.
+ * @return {JSON} A JSON object.
+ */
+async function postData<T>(url: string, errorMsg: string, data: string): Promise<T | undefined> {
+  const response = wretch(url)
+    .post(data)
+    .text<T>()
+    .catch(error => {
+      console.error(`${error.status}: ${error.message}`)
+      Notifier.push({
+        mode: 'error',
+        text: errorMsg,
+        title: USER_MESSAGE.ERROR
+      });
+      return undefined
+    });
+  return response
 }
 
 
@@ -115,11 +136,37 @@ async function getFeatureById(id: string): Promise<Feature | undefined> {
   return feature;
 }
 
+
+/**
+ * Fonction de transaction WFS.
+ * Mode possibles : update, delete, insert
+ * @param feature Entité de transaction
+ * @param mode Mode de transaction
+ */
+async function wfsTransaction(feature: Feature | undefined, mode: TransactionMode): Promise<void> {
+  // Formatage de la feature
+  const wfsFeature = TransactionServices.formatFeature(feature)
+  // Requêtage des paramètres WFS
+  const options = TransactionServices.getTransactionOptions()
+  // Ecriture de la transaction
+  const rawTransaction = TransactionServices.writeTransactionByMode(mode, wfsFeature, options)
+
+  // Formatage en string, envoi de la requête et notification des resultats
+  if (rawTransaction) {
+    // Initialisation du sérialiseur
+    const xmlSerializer = new XMLSerializer();
+    const stringTransaction = xmlSerializer.serializeToString(rawTransaction)
+    const wfsRequest = await postData<Document | Element | Object | string>(CONNECTION_PROPERTIES.GEOSERVER.URL, CONNECTION_PROPERTIES.GEOSERVER.ERROR, stringTransaction)
+    TransactionServices.transactionNotify(wfsRequest, mode)
+  }
+}
+
 const ApiRequestor = {
   getStyles,
   getTypologies,
   getBBox,
-  getFeatureById
+  getFeatureById,
+  wfsTransaction
 };
 
 export default ApiRequestor;

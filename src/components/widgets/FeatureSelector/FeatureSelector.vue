@@ -1,44 +1,20 @@
 <template>
-  <q-table
-    v-if="features.length > 0"
-    ref="fTable"
-    v-model:selected="selectedFeature"
-    style="max-height: 400px"
-    flat
-    bordered
-    square
-    title="Entités"
-    :rows="features"
-    :columns="columns"
-    row-key="id_"
-    selection="single"
-    virtual-scroll
-    class="no-shadow"
-    :rows-per-page-options="[0]"
-    @selection="onRowSelection">
+  <q-table v-if="features.length > 0" ref="fTable" v-model:selected="selectedFeature" style="max-height: 400px" flat
+    bordered square title="Entités" :rows="features" :columns="columns" row-key="id_" selection="single" virtual-scroll
+    class="no-shadow" :rows-per-page-options="[0]" @selection="onRowSelection">
     <template #bottom>
       <q-space />
-      <q-btn
-        flat
-        square
-        color="primary"
-        label="Retour"
-        class="q-ml-sm"
-        @click="back"/>
-      <q-btn
-        square
-        :disable="selectedFeature.length < 1"
-        color="primary"
-        icon="done"
-        label="Continuer"
-        class="merriweather"
-        @click="next" />
+      <q-btn flat square color="primary" label="Retour" class="q-ml-sm" @click="back" />
+      <q-btn square :disable="selectedFeature.length < 1" color="primary" icon="done" label="Continuer"
+        class="merriweather" @click="next" />
     </template>
   </q-table>
-  <p
-    v-else>
-    Cliquer sur une entité pour la sélectionner
-  </p>
+  <div v-else>
+    <p>
+      Cliquer sur une entité pour la sélectionner
+    </p>
+    <q-btn square flat color="primary" label="Retour" class="q-ml-sm" @click="back" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -46,7 +22,6 @@ import { Ref, ref, onDeactivated, onActivated, onUnmounted } from 'vue';
 import { QTable, QTableProps } from 'quasar';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { FeatureLike } from 'ol/Feature';
-import { VECTOR_TILE_LAYERS_SETTINGS } from 'src/map/layers/enum';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
 import { MapBrowserEvent } from 'ol';
 import { FeatureCollection } from 'geojson';
@@ -111,7 +86,7 @@ async function formatTypologies(): Promise<void> {
 
 
 /**
- * Fonction de gestion des sélections selon un événement (dans notre cas, ils'agit d'un clic)
+ * Fonction de gestion des sélections selon un événement (dans notre cas, il s'agit d'un clic)
  * @param e Type d'événement
  */
 const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
@@ -167,7 +142,7 @@ function onRowSelection(selected: ISelected): void {
 
 
 /**
- * Stylisation pour la sélection du tableau globale
+ * Stylisation pour la sélection générale (1ère sélection)
  * @param feature
  */
 function selectionFeatureStyle(feature: FeatureLike): Style | undefined {
@@ -178,7 +153,7 @@ function selectionFeatureStyle(feature: FeatureLike): Style | undefined {
 
 
 /**
- * Stylisation pour les features sélectionnées dans le tableau
+ * Stylisation pour la sélection "fine" (2nde sélection)
  * @param feature
  */
 function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
@@ -191,7 +166,7 @@ function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
 /**
  * Fonction de retour à l'étape précéddente
  */
- function back(): void {
+function back(): void {
   emit('selectorBack')
 }
 

@@ -3,22 +3,12 @@
     <div class="sidebar no-shadow">
       <q-list>
 
-        <q-item
-          v-for="widget in widgets"
-          :key="widget.title"
-          clickable
-          class="sidebar-items"
-          :class="{'active': widget.title === activeTool}"
-          @click="setWidget(widget.title)">
+        <q-item v-for="widget in widgets" :key="widget.title" clickable class="sidebar-items"
+          :class="{ 'active': widget.title === activeTool }" @click="setWidget(widget.title)">
           <q-item-section avatar>
             <q-icon :name="widget.icon" />
           </q-item-section>
-          <q-tooltip
-            anchor="center right"
-            self="center left"
-            transition-show="scale"
-            transition-hide="scale"
-            :delay=700
+          <q-tooltip anchor="center right" self="center left" transition-show="scale" transition-hide="scale" :delay=700
             style="border-radius: 0;">
             {{ widget.tooltip }}
           </q-tooltip>
@@ -30,12 +20,7 @@
           <q-item-section avatar>
             <q-icon name="sym_o_add" />
           </q-item-section>
-          <q-tooltip
-            anchor="center right"
-            self="center left"
-            transition-show="scale"
-            transition-hide="scale"
-            :delay=700
+          <q-tooltip anchor="center right" self="center left" transition-show="scale" transition-hide="scale" :delay=700
             style="border-radius: 0;">
             {{ 'Zoom in' }}
           </q-tooltip>
@@ -45,12 +30,7 @@
           <q-item-section avatar>
             <q-icon name="sym_o_remove" />
           </q-item-section>
-          <q-tooltip
-            anchor="center right"
-            self="center left"
-            transition-show="scale"
-            transition-hide="scale"
-            :delay=700
+          <q-tooltip anchor="center right" self="center left" transition-show="scale" transition-hide="scale" :delay=700
             style="border-radius: 0;">
             {{ 'Zoom out' }}
           </q-tooltip>
@@ -58,11 +38,9 @@
       </q-list>
     </div>
 
-    <div class="content no-shadow">
+    <div class="no-shadow">
       <keep-alive>
-        <component
-          :is="widgets[activeTool]?.tool"
-          :width="widgets[activeTool]?.width">
+        <component :is="widgets[activeTool]?.tool" :width="widgets[activeTool]?.width">
         </component>
       </keep-alive>
     </div>
@@ -71,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, Ref } from 'vue';
+import { ref, Ref } from 'vue';
 
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { useWidgetStore } from 'src/stores/widgetStore/widget-store';
@@ -105,7 +83,7 @@ function zoom(value: number): void {
  * Fonction de gestion du widget actif
  * @param toolname nom du widget à activer / désactiver
  */
-function setWidget(toolname :string): void {
+function setWidget(toolname: string): void {
   // Si le widget est actif alors il est desactivé. Sinon le widget change.
   activeTool.value === toolname ? activeTool.value = '' : activeTool.value = toolname
 }
@@ -126,15 +104,8 @@ function setWidget(toolname :string): void {
   overflow: hidden
 .sidebar-items
   border: none
-  color: $primary
-  background-color: $secondary
   overflow: hidden
   &.active
     color: $secondary
     background-color: $primary
-
-.content
-  border-top: $borderDefault
-  border-right: $borderDefault
-  border-bottom: $borderDefault
 </style>

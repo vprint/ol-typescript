@@ -1,5 +1,11 @@
 <template>
-  <RegularWidget title="Processing"></RegularWidget>
+  <RegularWidget>
+    <template #header>
+      Processing
+    </template>
+    <template #component>
+    </template>
+  </RegularWidget>
 </template>
 
 <script setup lang="ts">

@@ -4,16 +4,17 @@
       <div id="map" class="map-container"></div>
     </q-page-container>
     <widget-toolbar />
-    <background-tool/>
+    <background-tool />
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { Map, View } from 'ol';
 import { fromLonLat } from 'ol/proj'
-import {MAP_SETTINGS } from '../map/settings/enum'
+import { MAP_SETTINGS } from '../map/settings/enum'
 import MapLayers from '../map/layers/mapLayers'
 import { useMapStore } from '../stores/mapStore/map-store'
+import addControllers from '../map/mapElement/mapElement'
 
 import { ref, onMounted } from 'vue';
 import type { Ref } from 'vue'
@@ -25,7 +26,7 @@ import BackgroundTool from './widgets/BackgroundTool/BackgroundTool.vue';
 const map: Ref<Map | undefined> = ref<Map>()
 const mapStore = useMapStore();
 
-onMounted(()=>{
+onMounted(() => {
   map.value = new Map({
     target: 'map',
     controls: [],
@@ -39,6 +40,8 @@ onMounted(()=>{
 
   mapStore.setMap(map.value)
   new MapLayers(map.value);
+  addControllers(map.value)
+
 })
 </script>
 

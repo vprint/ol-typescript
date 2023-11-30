@@ -8,6 +8,8 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { Feature } from 'ol';
 import { TransactionMode } from '../TransactionServices/type';
 import TransactionServices from '../TransactionServices/TransactionServices';
+import RenderFeature from 'ol/render/Feature';
+import { FeatureLike } from 'ol/Feature';
 
 /**
  * Fonction de requêtage des JSON.
@@ -124,7 +126,7 @@ async function getBBox(ids: (string | number | undefined)[]): Promise<FeatureCol
  * @param id Id de l'entité
  * @returns Feature
  */
-async function getFeatureById(id: string): Promise<Feature | undefined> {
+async function getFeatureById(id: string): Promise<FeatureLike | RenderFeature[] | undefined> {
   const result = await getJSON<FeatureCollection>(
     `${CONNECTION_PROPERTIES.FeatureServer.Collections}carto.td_features/items?id=${id}`,
     USER_MESSAGE.FEATURE_ERROR,

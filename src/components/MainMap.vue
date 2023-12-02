@@ -16,18 +16,17 @@ import MapLayers from '../map/layers/mapLayers'
 import { useMapStore } from '../stores/mapStore/map-store'
 import addControllers from '../map/mapElement/mapElement'
 
-import { ref, onMounted } from 'vue';
-import type { Ref } from 'vue'
+import { onMounted } from 'vue';
 
 
 import WidgetToolbar from './widgets/WidgetsToolbar/WidgetsToolbar.vue';
 import BackgroundTool from './widgets/BackgroundTool/BackgroundTool.vue';
 
-const map: Ref<Map | undefined> = ref<Map>()
+let map: Map | undefined
 const mapStore = useMapStore();
 
 onMounted(() => {
-  map.value = new Map({
+  map = new Map({
     target: 'map',
     controls: [],
     view: new View({
@@ -38,9 +37,9 @@ onMounted(() => {
     })
   });
 
-  mapStore.setMap(map.value)
-  new MapLayers(map.value);
-  addControllers(map.value)
+  mapStore.setMap(map)
+  new MapLayers(map);
+  addControllers(map)
 
 })
 </script>

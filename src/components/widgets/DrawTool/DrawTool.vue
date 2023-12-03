@@ -1,8 +1,7 @@
 <template>
   <div class="drawer no-shadow" style="font-size: 2em;">
     <q-list>
-
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="drawInteraction('Polygon')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Polygon')">
         <q-item-section avatar>
           <q-icon name="sym_o_pentagon" />
         </q-item-section>
@@ -12,7 +11,7 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="drawInteraction('LineString')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('LineString')">
         <q-item-section avatar>
           <q-icon name="sym_o_timeline" />
         </q-item-section>
@@ -22,7 +21,7 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="drawInteraction('Circle')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Circle')">
         <q-item-section avatar>
           <q-icon name="sym_o_circle" />
         </q-item-section>
@@ -66,13 +65,13 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode !== 'modifyFeature'" clickable @click="deleteFeature">
+      <q-item v-if="drawMode !== 'modifyFeature'" clickable @click="clearFeature">
         <q-item-section avatar>
           <q-icon name="sym_o_delete" />
         </q-item-section>
         <q-tooltip anchor="center right" self="center left" transition-show="scale" transition-hide="scale" :delay=500
           style="border-radius: 0;">
-          Localiser
+          Effacer
         </q-tooltip>
       </q-item>
 
@@ -80,127 +79,94 @@
   </div>
 </template>
 
-<script setup lang="ts">
 
-import { onUnmounted, onDeactivated, onActivated, onMounted } from 'vue';
-import { ref, toRefs } from 'vue';
-import { Draw, Modify } from 'ol/interaction'
+<script setup lang="ts">
+import { Draw, Modify } from 'ol/interaction';
+import { IDrawMode } from './type';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { VECTOR_LAYERS_SETTINGS } from 'src/map/layers/enum';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { Type } from 'ol/geom/Geometry';
+import { ref, onMounted, onUnmounted, onDeactivated, onActivated } from 'vue';
+import UndoRedo from 'ol-ext/interaction/UndoRedo';
+import { easeOut } from 'ol/easing';
+import ApiRequestor from 'src/services/Api/ApiRequestor';
 import { FeatureLike } from 'ol/Feature';
 import RenderFeature from 'ol/render/Feature';
-import ApiRequestor from 'src/services/Api/ApiRequestor';
-import { easeOut } from 'ol/easing';
-import UndoRedo from 'ol-ext/interaction/UndoRedo'
-import { Type } from 'ol/geom/Geometry';
-import { IDrawMode, IInteraction } from './type'
 
-const props = defineProps<{
-  drawMode: IDrawMode,
-  featureId: string | number | undefined
-}>();
-
-const { drawMode } = toRefs(props);
 const mapStore = useMapStore()
 const editionLayer = mapStore.getLayerByName(VECTOR_LAYERS_SETTINGS.EDITION_LAYER.NAME) as VectorLayer<VectorSource>
 const editionLayerSource = editionLayer.getSource()
 const disableUndo = ref(true)
 const disableRedo = ref(true)
 
-let fullFeature: FeatureLike | RenderFeature[] | undefined
-let draw: Draw
-let modifyInteraction: Modify
-
-
-function drawInteraction(mode: Type): void {
-  removeCustomInteraction('modify')
-
-  // Nettoyage de la source
-  editionLayerSource?.clear()
-  editionLayerSource?.refresh()
-
-  // Ajout de l'interaction de dessin
-  draw = new Draw({
-    source: editionLayerSource ? editionLayerSource : undefined,
-    type: mode,
-
-  })
-  mapStore.map?.addInteraction(draw)
-
-  editionLayerSource?.on('addfeature', () => {
-    // Suppression de l'interaction
-    removeCustomInteraction('draw')
-    Modifier()
-  })
-}
-
-function removeCustomInteraction(interactionType: IInteraction): void {
-  mapStore.map?.getInteractions().forEach(interaction => {
-    if (interactionType === 'draw') {
-      if (interaction instanceof Draw) {
-        mapStore.map?.removeInteraction(interaction)
-      }
-    }
-    else {
-      if (interaction instanceof Modify) {
-        mapStore.map?.removeInteraction(interaction)
-      }
-    }
-  })
-}
-
-function deleteFeature(): void {
-  editionLayerSource?.clear()
-  editionLayerSource?.refresh()
-}
-
-function Modifier(): void {
-  // Ajout de l'interaction de dessin
-  modifyInteraction = new Modify({
-    source: editionLayerSource ? editionLayerSource : undefined
-  })
-  mapStore.map?.addInteraction(modifyInteraction)
-}
-
-
+const props = defineProps<{
+  drawMode: IDrawMode,
+  featureId: string | number | undefined
+}>();
 
 // Ajout de l'interaction retour/refaire
 const undoRedo = new UndoRedo({
   layers: [editionLayer]
 })
+undoRedo.set('name', 'undoRedoInteraction')
 
-
-
+let drawInteraction: Draw
+let modifyInteraction: Modify
+let fullFeature: FeatureLike | RenderFeature[] | undefined
 
 /**
- * Fonction de récupération de l'entité à éditer
+ * Fonction d'ajout de géométrie
+ * @param drawMode Mode de dessin
  */
-async function initializeFeature(): Promise<void> {
-  if (props.drawMode === 'modifyFeature') {
-    // Récupération de l'entité non simplifiée et affichage sur le layer d'édition
-    fullFeature = await ApiRequestor.getFeatureById(props.featureId as string)
-    // @ts-ignore
-    fullFeature ? editionLayerSource?.addFeature(fullFeature) : null
-  }
-  editionLayer.setVisible(true)
+function addDrawInteraction(drawMode: Type): void {
+  // Suppression des interactions et des features existantes
+  clearFeature()
+
+  // Ajout de l'interaction de dessin
+  drawInteraction = new Draw({
+    source: editionLayerSource ? editionLayerSource : undefined,
+    type: drawMode
+  });
+  drawInteraction.set('name', 'drawInteraction')
+  mapStore.map?.addInteraction(drawInteraction);
+
+  // Supression de la fonction de dessin lors d'un ajout de géométrie et ajout de la fonction de modification
+  drawInteraction.on('drawend', () => {
+    mapStore.removeInteractionsByName('drawInteraction')
+    addModifyInteraction()
+  })
 }
 
+/**
+ * Ajout de l'interaction de modification
+ */
+function addModifyInteraction(): void {
+  mapStore.removeInteractionsByName('modifyInteraction')
+
+  // Ajout de l'interaction de dessin
+  modifyInteraction = new Modify({
+    source: editionLayerSource ? editionLayerSource : undefined
+  })
+  modifyInteraction.set('name', 'modifyInteraction')
+  mapStore.map?.addInteraction(modifyInteraction)
+
+  // Activation de retour arrière
+  modifyInteraction.on('modifyend', () => {
+    disableUndo.value = false
+  })
+}
 
 /**
- * Function de zoom sur l'objet édité
+ * Fonction de suppression des features de la couche d'édition
  */
-function locate(): void {
-  const extent = editionLayerSource?.getFeatures()[0].getGeometry()?.getExtent()
-  if (extent) {
-    mapStore.map?.getView().fit(extent, {
-      padding: [50, 50, 50, 600],
-      maxZoom: 17,
-      duration: 250,
-      easing: easeOut
-    })
-  }
+function clearFeature(): void {
+  mapStore.removeInteractionsByName('drawInteraction')
+  mapStore.removeInteractionsByName('modifyInteraction')
+  editionLayerSource?.clear()
+  disableUndo.value = true
+  disableRedo.value = true
 }
 
 /**
@@ -225,29 +191,59 @@ function redo(): void {
   }
 }
 
+/**
+ * Function de localisation de l'objet édité
+ */
+function locate(): void {
+  const extent = editionLayerSource?.getFeatures()[0].getGeometry()?.getExtent()
+  if (extent) {
+    mapStore.map?.getView().fit(extent, {
+      padding: [50, 50, 50, 600],
+      maxZoom: 17,
+      duration: 250,
+      easing: easeOut
+    })
+  }
+}
+
+/**
+ * Fonction de récupération de l'entité à éditer
+ */
+async function initializeFeature(): Promise<void> {
+  // Récupération de l'entité non simplifiée et affichage sur le layer d'édition
+  fullFeature = await ApiRequestor.getFeatureById(props.featureId as string)
+  // @ts-ignore
+  fullFeature ? editionLayerSource?.addFeature(fullFeature) : null
+}
 
 /**
  * Gestion du montage du composant
  */
 onMounted(() => {
-  initializeFeature()
-  Modifier()
+  editionLayer.setVisible(true)
+  if (props.drawMode === 'modifyFeature') {
+    initializeFeature()
+    addModifyInteraction()
+  }
   mapStore.map?.addInteraction(undoRedo)
-  modifyInteraction.on('modifyend', () => {
-    disableUndo.value = false
-  })
 })
+
+
 
 
 /**
  * Gestion du démontage du composant
  */
 onUnmounted(() => {
+  mapStore.removeInteractionsByName('drawInteraction')
+  mapStore.removeInteractionsByName('modifyInteraction')
+  mapStore.removeInteractionsByName('undoRedoInteraction')
   editionLayer.setVisible(false)
   editionLayerSource?.clear()
-  removeCustomInteraction('draw')
-  removeCustomInteraction('modify')
+
 });
+
+
 
 
 /**
@@ -255,9 +251,11 @@ onUnmounted(() => {
  */
 onDeactivated(() => {
   modifyInteraction.setActive(false)
-  draw.setActive(false)
+  drawInteraction.setActive(false)
   editionLayer.setVisible(false)
 });
+
+
 
 
 /**
@@ -265,7 +263,7 @@ onDeactivated(() => {
  */
 onActivated(() => {
   modifyInteraction.setActive(true)
-  draw.setActive(true)
+  drawInteraction.setActive(true)
   editionLayer.setVisible(true)
 });
 

@@ -1,7 +1,7 @@
 <template>
-  <q-table v-if="features.length > 0" ref="fTable" v-model:selected="selectedFeature" style="max-height: 400px" flat
-    bordered square title="Entités" :rows="features" :columns="columns" row-key="id_" selection="single" virtual-scroll
-    class="no-shadow" :rows-per-page-options="[0]" @selection="onRowSelection">
+  <q-table v-if="features.length > 0" ref="fTable" v-model:selected="selectedFeature" flat bordered square title="Entités"
+    :rows="features" :columns="columns" row-key="id_" selection="single" virtual-scroll class="regular-selector"
+    :rows-per-page-options="[0]" @selection="onRowSelection">
     <template #bottom>
       <q-space />
       <q-btn flat square color="primary" label="Retour" class="q-ml-sm" @click="back" />
@@ -72,6 +72,8 @@ const selectionStyle = new Style({
 const emit = defineEmits(['selectorBack', 'selectorNext'])
 
 
+
+
 /**
  * Fonction de récupération et de formatage des typologies
  */
@@ -83,6 +85,8 @@ async function formatTypologies(): Promise<void> {
     })
   }
 }
+
+
 
 
 /**
@@ -109,6 +113,8 @@ const selector = async (e: MapBrowserEvent<UIEvent>): Promise<void> => {
   selectionLayer.setStyle(selectionFeatureStyle)
   featuresBBox = await ApiRequestor.getBBox(selectedIds)
 }
+
+
 
 
 /**
@@ -141,6 +147,8 @@ function onRowSelection(selected: ISelected): void {
 }
 
 
+
+
 /**
  * Stylisation pour la sélection générale (1ère sélection)
  * @param feature
@@ -150,6 +158,8 @@ function selectionFeatureStyle(feature: FeatureLike): Style | undefined {
     return selectionStyle;
   }
 }
+
+
 
 
 /**
@@ -163,6 +173,8 @@ function selectedFeatureStyle(feature: FeatureLike): Style | undefined {
 }
 
 
+
+
 /**
  * Fonction de retour à l'étape précéddente
  */
@@ -170,12 +182,18 @@ function back(): void {
   emit('selectorBack')
 }
 
+
+
+
 /**
  * Fonction de passage à l'étape suivante
  */
 function next(): void {
   emit('selectorNext', selectedFeature.value[0])
 }
+
+
+
 
 /**
  * Gestion de la desactivation du composant
@@ -185,6 +203,9 @@ onDeactivated(() => {
   selectionLayer.setVisible(false);
 });
 
+
+
+
 /**
  * Gestion de l'activation du composant
  */
@@ -192,6 +213,9 @@ onActivated(() => {
   mapStore.map?.on('click', selector);
   selectionLayer.setVisible(true);
 });
+
+
+
 
 /**
  * Gestion de la destruction du widget
@@ -204,7 +228,17 @@ onUnmounted(() => {
   selectionLayer.getSource()?.refresh()
 });
 
+
+
+
 formatTypologies()
 mapStore.map?.on('click', selector)
 
 </script>
+
+<style lang="sass" scoped>
+.regular-selector
+  background-color: $secondary
+  max-height: 400px
+</style>
+

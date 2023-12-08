@@ -6,74 +6,117 @@
     </template>
 
     <template #component>
-      <q-stepper v-model="step" vertical color="primary" animated class="no-shadow">
+      <q-stepper v-model="step" vertical color="primary" animated class="no-shadow regular-stepper">
 
         <q-step :name="1" title="Type d'action" :done="step > 1" class="merriweather">
           <p>Sélectionner l'action à effectuer.</p>
           <q-stepper-navigation>
             <div class="row justify-end">
               <q-btn square flat icon="mdi-shape-polygon-plus" color="primary" label="Créer" class="merriweather"
-                @click="setStep({ toStep: 2, toActionType: 'create' })" />
+                @click="setStep({ toStep: 3, toDrawMode: 'addFeature' })" />
               <q-btn square flat icon="mdi-cursor-default-click-outline" color="primary" label="Editer"
-                class="merriweather" @click="setStep({ toStep: 3, toActionType: 'edit' })" />
+                class="merriweather" @click="setStep({ toStep: 2 })" />
             </div>
           </q-stepper-navigation>
         </q-step>
 
-        <q-step :name="2" title="Créer une entité" icon="create_new_folder" :done="step > 2"
-          :disable="actionType === 'edit'" class="merriweather">
-          <p>Dessiner une nouvelle entité sur la carte.</p>
-          <q-stepper-navigation>
-            <div class="row justify-end">
-              <q-btn square flat color="primary" label="Retour" class="q-ml-sm" @click="setStep({ toStep: 1 })" />
-              <q-btn square color="primary" icon="done" label="Continuer" class="merriweather"
-                @click="setStep({ toStep: 4 })" />
-            </div>
-          </q-stepper-navigation>
-        </q-step>
-
-        <q-step :name="3" title="Sélectionner une entité" icon="ads_click" active-icon="ads_click" :done="step > 3"
-          :disable="actionType === 'create'" class="merriweather">
+        <q-step :name="2" title="Sélectionner une entité" icon="ads_click" active-icon="ads_click" :done="step > 2"
+          :disable="drawMode === 'addFeature'" class="merriweather">
           <q-stepper-navigation>
             <feature-selector @selector-next="enableModification" @selector-back="setStep({ toStep: 1 })" />
           </q-stepper-navigation>
         </q-step>
 
-        <q-step :name="4" title="Attributs" icon="view_headline" class="merriweather">
-          <p>Modifier les informations attributaires</p>
+        <q-step :name="3" title="Attributs" icon="view_headline" class="merriweather">
 
-          <q-form class="q-gutter-md">
-            <q-select v-model="featureType" :options="typologiesFormatted" option-label="typology_name"
-              option-value="id_typology" label="Types" />
-            <q-input v-model="observation" label="Observation" />
-          </q-form>
+          <!-- Mode ajout de feature -->
+          <div v-if="drawMode === 'addFeature'">
+            <p>Ajouter les informations attributaires</p>
 
-          <q-stepper-navigation>
-            <div class="row justify-end">
-              <q-btn :loading="pendingTransaction" :disabled="pendingTransaction" square flat color="primary"
-                label="Retour" class="shadow-1" @click="setStep({ toStep: 3 }), reset()">
-                <template v-slot:loading>
-                  <q-spinner-puff class="on-left" />
-                </template>
-              </q-btn>
+            <q-form @reset="onReset" class="q-gutter-md">
+              <q-select v-model="insertType" :options="typologiesFormatted" option-label="typology_name"
+                option-value="id_typology" label="Types" />
+              <q-input v-model="observation" label="Observation" />
 
-              <q-space />
+              <div class="row justify-end">
+                <q-btn :disabled="pendingTransaction" label="Retour" type="reset" color="primary" flat class="q-ml-sm" />
+                <q-space />
+                <q-btn :disabled="pendingTransaction" label="Enregistrer" square color="positive"
+                  @click="inserting = true" />
+              </div>
+            </q-form>
 
-              <q-btn :loading="pendingTransaction" :disabled="pendingTransaction" square color="primary" label="Supprimer"
-                class="q-mr-sm shadow-1" @click="serverTransaction('delete')">
-                <template v-slot:loading>
-                  <q-spinner-puff class="on-left" />
-                </template>
-              </q-btn>
+            <!-- Popup création de feature-->
+            <q-dialog v-model="inserting" persistent>
+              <q-card>
+                <q-card-section class="row items-center">
+                  <q-avatar icon="save" color="primary" text-color="white" />
+                  <span class="q-ml-sm merriweather">Confirmer l'insertion en base</span>
+                </q-card-section>
 
-              <q-btn :loading="pendingTransaction" :disabled="pendingTransaction" square color="positive"
-                label="Enregistrer" class="shadow-1" @click="serverTransaction('update')">
-                <template v-slot:loading>
-                  <q-spinner-puff class="on-left" />
-                </template>
-              </q-btn>
-            </div>
-          </q-stepper-navigation>
+                <q-card-actions align="right">
+                  <q-btn flat class="merriweather" label="Annuler" color="primary" v-close-popup />
+                  <q-space />
+                  <q-btn flat class="merriweather" label="Insérer" color="primary" @click="serverTransaction('insert')"
+                    v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+
+          </div>
+
+          <!-- Mode modification de feature -->
+          <div v-if="drawMode === 'modifyFeature'">
+            <p>Modifier les informations attributaires</p>
+
+            <q-form @reset="onReset" class="q-gutter-md">
+              <q-select v-model="updateType" :options="typologiesFormatted" option-label="typology_name"
+                option-value="id_typology" label="Types" />
+              <q-input v-model="observation" label="Observation" />
+
+              <div class="row justify-end">
+                <q-btn :disabled="pendingTransaction" label="Retour" type="reset" color="primary" flat class="q-ml-sm" />
+                <q-space />
+                <q-btn :disabled="pendingTransaction" label="Supprimer" square color="primary" class="q-mr-sm"
+                  @click="deleting = true" />
+                <q-btn :disabled="pendingTransaction" label="Enregistrer" square color="positive"
+                  @click="updating = true" />
+              </div>
+            </q-form>
+
+            <!-- Popup supression de feature-->
+            <q-dialog v-model="deleting" persistent>
+              <q-card>
+                <q-card-section class="row items-center">
+                  <q-avatar icon="sym_o_delete" color="primary" text-color="white" />
+                  <span class="q-ml-sm merriweather">Cette action est définitive. Confirmer la suppression ?</span>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                  <q-btn flat class="merriweather" label="Annuler" color="primary" v-close-popup />
+                  <q-btn flat class="merriweather" label="Supprimer" color="primary" @click="serverTransaction('delete')"
+                    v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+
+            <!-- Popup de mise à jour de feature-->
+            <q-dialog v-model="updating" persistent>
+              <q-card>
+                <q-card-section class="row items-center">
+                  <q-avatar icon="save" color="primary" text-color="white" />
+                  <span class="q-ml-sm merriweather">Cette action est définitive. Confirmer les modifications ?</span>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                  <q-btn flat class="merriweather" label="Annuler" color="primary" v-close-popup />
+                  <q-btn flat class="merriweather" label="Enregistrer" color="primary"
+                    @click="serverTransaction('update')" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+
+          </div>
         </q-step>
 
       </q-stepper>
@@ -92,7 +135,7 @@ import RegularWidget from '../RegularWidget/RegularWidget.vue';
 import featureSelector from '../FeatureSelector/FeatureSelector.vue';
 import { ref, Ref } from 'vue';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
-import { ISqlTypologies, ITypologies } from 'src/services/Api/types';
+import { ISQLTypologies, ITypologies } from 'src/services/Api/types';
 import { FeatureLike } from 'ol/Feature';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import VectorLayer from 'ol/layer/Vector';
@@ -100,34 +143,41 @@ import VectorSource from 'ol/source/Vector';
 import DrawTool from '../DrawTool/DrawTool.vue';
 import { VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS } from 'src/map/layers/enum';
 import VectorTileLayer from 'ol/layer/VectorTile';
-import { TransactionMode } from 'src/services/TransactionServices/type';
+import { ITransactionMode } from 'src/services/TransactionServices/type';
+import { IDrawMode } from '../DrawTool/type';
 
 
 const step = ref(1)
-const actionType = ref('')
-const featureType: Ref<ISqlTypologies | undefined> = ref(undefined)
+const updateType: Ref<ISQLTypologies | undefined> = ref(undefined)
+const insertType: Ref<ISQLTypologies | undefined> = ref(undefined)
 const observation: Ref<string | undefined> = ref('')
 const typologiesRaw = ApiRequestor.getTypologies()
-const drawMode: Ref<string> = ref('')
+const drawMode: Ref<IDrawMode> = ref('')
 const mapStore = useMapStore()
 const editionLayer = mapStore.getLayerByName(VECTOR_LAYERS_SETTINGS.EDITION_LAYER.NAME) as VectorLayer<VectorSource>
 const pendingTransaction = ref(false)
+const deleting = ref(false)
+const updating = ref(false)
+const inserting = ref(false)
+
 
 let featureId: string | number | undefined
 let typologiesFormatted: ITypologies | undefined = undefined
 
-setTypologies(typologiesRaw)
+
 
 /**
  * Fonction de modification des étapes
  * @param toStep Etape cible
- * @param toActionType Action cible
+ * @param toDrawMode Mode de dessin
  */
-function setStep({ toStep, toActionType, toDrawMode }: { toStep: number, toActionType?: string, toDrawMode?: string }): void {
+function setStep({ toStep, toDrawMode }: { toStep: number, toDrawMode?: IDrawMode }): void {
   step.value = toStep;
-  toActionType ? actionType.value = toActionType : null;
   toDrawMode ? drawMode.value = toDrawMode : drawMode.value = '';
 }
+
+
+
 
 /**
  * Définition du nom des typologies pour la liste de sélection
@@ -138,40 +188,83 @@ async function setTypologies(typologyPromise: Promise<ITypologies | undefined>):
   typologiesFormatted = typologyList
 }
 
+
+
+
 /**
  * Activation des modifications attributaires et géométriques
  * @param feature
  */
 async function enableModification(feature: FeatureLike): Promise<void> {
-  setStep({ toStep: 4, toDrawMode: 'modifyFeature' })
+  setStep({ toStep: 3, toDrawMode: 'modifyFeature' })
   featureId = feature.getId()
 
   // Gestion de la typologie de l'entité sélectionnée
   const typologies = await typologiesRaw
 
   // Attribution des valeurs du formulaire
-  featureType.value = typologies?.find((element) => element.id_typology === feature.get('id_typology'))
+  updateType.value = typologies?.find((element) => element.id_typology === feature.get('id_typology'))
   observation.value = feature.get('commentaire')
 }
+
+
+
+
+async function setinsertType(): Promise<void> {
+  const typologies = await typologiesRaw
+  console.log('exec')
+  insertType.value = typologies?.find((element) => element.id_typology === 0)
+  console.log(insertType.value)
+}
+
+
+
 
 /**
  * Fonction de transaction
  * @param mode Mode de transaction (insert, update, delete)
  */
-async function serverTransaction(mode: TransactionMode): Promise<void> {
+async function serverTransaction(mode: ITransactionMode): Promise<void> {
   pendingTransaction.value = true
   const feature = editionLayer.getSource()?.getFeatures()[0]
 
   // Récupération des valeurs du formulaire
   feature?.set('commentaire', observation.value);
-  feature?.set('id_typology', featureType.value?.id_typology)
 
-  // Execution de la transaction et rafraichissement du layer
-  await ApiRequestor.wfsTransaction(feature, mode)
+  if (mode === 'update' || mode === 'delete') {
+    feature?.set('id_typology', updateType.value?.id_typology);
+  } else {
+    feature?.set('id_typology', insertType.value?.id_typology);
+  }
+
+
+  // Execution de la transaction
+  const wfsTransactionResult = await ApiRequestor.wfsTransaction(feature, mode)
+
+  // Supression de la géométrie si mode === delete
+  if (mode === 'delete' && wfsTransactionResult.result) {
+    editionLayer.getSource()?.clear()
+    setStep({
+      toStep: 1
+    })
+  }
+  // Passage en mode édition si mode === insert
+  else if (mode === 'insert' && wfsTransactionResult.result) {
+    setStep({
+      toStep: 3,
+      toDrawMode: 'modifyFeature'
+    })
+    feature?.setId(wfsTransactionResult.id)
+    updateType.value = insertType.value
+  }
+
+  // rafraichissement du layer et desactivation du mode transaction
   refreshLayer()
   pendingTransaction.value = false
-
 }
+
+
+
 
 /**
  * Fonction de rafraichissement du layer d'édition
@@ -182,16 +275,34 @@ function refreshLayer(): void {
 }
 
 
+
+
 /**
  * Fonction de réinitialisation
  */
-function reset(): void {
+function onReset(): void {
+  if (drawMode.value === 'modifyFeature') {
+    setStep({
+      toStep: 2
+    })
+  } else {
+    setStep({
+      toStep: 1
+    })
+  }
   editionLayer.getSource()?.clear()
+  featureId = ''
+  observation.value = ''
+  updateType.value = undefined
 }
+
+
+setTypologies(typologiesRaw)
+setinsertType()
 
 </script>
 
 <style lang="sass" scoped>
-.global
-  display: flex
+.regular-stepper
+  background-color: $secondary
 </style>

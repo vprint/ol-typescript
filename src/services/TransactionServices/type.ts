@@ -1,2 +1,2 @@
 
-export type TransactionMode = 'insert' | 'update' | 'delete'
+export type ITransactionMode = 'insert' | 'update' | 'delete'

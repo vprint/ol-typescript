@@ -1,15 +1,18 @@
 import wretch from 'wretch';
 import { CONNECTION_PROPERTIES, USER_MESSAGE } from './enum';
 import Notifier from '../Notifier/Notifier';
-import { ISqlStyles, ILayersStyles, ITypologies } from './types';
+import { ISQLStyles, ILayersStyles, ITypologies, IWFSResult } from './types';
 import { Fill, Stroke, Style } from 'ol/style';
 import { FeatureCollection } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Feature } from 'ol';
-import { TransactionMode } from '../TransactionServices/type';
+import { ITransactionMode } from '../TransactionServices/type';
 import TransactionServices from '../TransactionServices/TransactionServices';
 import RenderFeature from 'ol/render/Feature';
 import { FeatureLike } from 'ol/Feature';
+
+
+
 
 /**
  * Fonction de requêtage des JSON.
@@ -30,6 +33,9 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
     });
   return response
 }
+
+
+
 
 /**
  * Fonction de postage des JSON.
@@ -52,13 +58,15 @@ async function postData<T>(url: string, errorMsg: string, data: string): Promise
 }
 
 
+
+
 /**
 * Requête des styles.
 * @return {LayersStyles | undefined} Array of olStyle or undefined.
 */
 async function getStyles(): Promise<ILayersStyles | undefined> {
   // Requête style
-  const result = await getJSON<ISqlStyles[]>(
+  const result = await getJSON<ISQLStyles[]>(
     `${CONNECTION_PROPERTIES.FeatureServer.Functions}carto.get_styles/items`,
     USER_MESSAGE.STYLE_ERROR,
   );
@@ -93,6 +101,8 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
 }
 
 
+
+
 /**
  * Fonction de requêtage des typologies
  */
@@ -104,6 +114,8 @@ async function getTypologies(): Promise<ITypologies | undefined> {
   );
   return result
 }
+
+
 
 
 /**
@@ -120,6 +132,9 @@ async function getBBox(ids: (string | number | undefined)[]): Promise<FeatureCol
   );
   return result;
 }
+
+
+
 
 /**
  * Fonction de requêtage d'entité par Id
@@ -139,27 +154,58 @@ async function getFeatureById(id: string): Promise<FeatureLike | RenderFeature[]
 }
 
 
+
+
 /**
  * Fonction de transaction WFS.
  * Mode possibles : update, delete, insert
  * @param feature Entité de transaction
  * @param mode Mode de transaction
  */
-async function wfsTransaction(feature: Feature | undefined, mode: TransactionMode): Promise<void> {
-  // Formatage de la feature
-  const wfsFeature = TransactionServices.formatFeature(feature)
+async function wfsTransaction(feature: Feature | undefined, mode: ITransactionMode): Promise<IWFSResult> {
+  let transactionResult: IWFSResult
+
   // Requêtage des paramètres WFS
   const options = TransactionServices.getTransactionOptions()
-  // Ecriture de la transaction
+
+  // Formatage de la feature et écriture de la transaction
+  const wfsFeature = TransactionServices.formatFeature(feature, mode)
   const rawTransaction = TransactionServices.writeTransactionByMode(mode, wfsFeature, options)
 
   // Formatage en string, envoi de la requête et notification des resultats
   if (rawTransaction) {
-    // Initialisation du sérialiseur
     const xmlSerializer = new XMLSerializer();
     const stringTransaction = xmlSerializer.serializeToString(rawTransaction)
+
+    // Envoi de la requête et analyse des résultats (true si transaction réussie, false sinon)
     const wfsRequest = await postData<Document | Element | Object | string>(CONNECTION_PROPERTIES.GEOSERVER.URL, CONNECTION_PROPERTIES.GEOSERVER.ERROR, stringTransaction)
-    TransactionServices.transactionNotify(wfsRequest, mode)
+    const resultAnalysis = TransactionServices.transactionNotify(wfsRequest, mode)
+
+    // Gestion de l'insertion
+    if (resultAnalysis && mode === 'insert') {
+      const insertedId = TransactionServices.getInsertedId(wfsRequest)
+      transactionResult = {
+        result: resultAnalysis,
+        id: insertedId
+      }
+      return transactionResult
+    }
+
+    // Gestion delete et update
+    else {
+      transactionResult = {
+        result: resultAnalysis
+      }
+      return transactionResult
+    }
+  }
+
+  // Gestion des erreurs serveurs
+  else {
+    transactionResult = {
+      result: false
+    }
+    return transactionResult
   }
 }
 

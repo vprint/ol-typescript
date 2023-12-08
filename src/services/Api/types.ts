@@ -2,7 +2,7 @@ import { ColorLike } from 'ol/colorlike';
 import { Style } from 'ol/style';
 
 
-export interface ISqlStyles {
+export interface ISQLStyles {
   fill_color: ColorLike | null | undefined,
   id_typology: number,
   line_dash: null | [],
@@ -13,10 +13,15 @@ export interface ISqlStyles {
 export type ILayersStyles = Record<string, Style[]>
 
 
-export interface ISqlTypologies {
+export interface ISQLTypologies {
   typology_name: string,
   id_style: number,
   id_typology: number,
   geom_type: string
 }
-export type ITypologies = ISqlTypologies[]
+export type ITypologies = ISQLTypologies[]
+
+export interface IWFSResult {
+  result: boolean,
+  id?: string
+}

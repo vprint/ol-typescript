@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { Map } from 'ol';
 import BaseLayer from 'ol/layer/Base';
+import { Interaction, Link } from 'ol/interaction';
 
 export const useMapStore = defineStore('map', {
   state: () => ({
@@ -30,5 +31,18 @@ export const useMapStore = defineStore('map', {
         .getArray()
         .find((layer: BaseLayer) => layer.get('name') === name)! as BaseLayer;
     },
+
+    /**
+     * Fonction de suppression des interaction par nom
+     * @param name Nom de l'interaction à supprimer
+     */
+    removeInteractionsByName(name: string): void {
+      this.$state._map?.getInteractions().getArray().forEach(interaction => {
+        if (interaction.get('name') === name) {
+          this.$state._map?.removeInteraction(interaction)
+        }
+      })
+    }
+
   }
 });

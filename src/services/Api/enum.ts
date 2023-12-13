@@ -7,7 +7,7 @@ export const CONNECTION_PROPERTIES = {
   },
   TREX_SERVER: 'http://localhost:6767/',
   GEOSERVER: {
-    URL: 'http://localhost:8080/geoserver/wfs?',
+    URL: 'http://localhost:8080/geoserver',
     FEATURES: {
       SERVICE_PREFIX: 'ArchaeoSpringMap',
       NAME: 'FEATURES',

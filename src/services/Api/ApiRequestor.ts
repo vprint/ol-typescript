@@ -178,7 +178,7 @@ async function wfsTransaction(feature: Feature | undefined, mode: ITransactionMo
     const stringTransaction = xmlSerializer.serializeToString(rawTransaction)
 
     // Envoi de la requête et analyse des résultats (true si transaction réussie, false sinon)
-    const wfsRequest = await postData<Document | Element | Object | string>(CONNECTION_PROPERTIES.GEOSERVER.URL, CONNECTION_PROPERTIES.GEOSERVER.ERROR, stringTransaction)
+    const wfsRequest = await postData<Document | Element | Object | string>(`${CONNECTION_PROPERTIES.GEOSERVER.URL}/wfs?`, CONNECTION_PROPERTIES.GEOSERVER.ERROR, stringTransaction)
     const resultAnalysis = TransactionServices.transactionNotify(wfsRequest, mode)
 
     // Gestion de l'insertion

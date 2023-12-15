@@ -1,6 +1,6 @@
 <template>
-  <q-page-sticky position="bottom" class="q-px-md q-py-md" @click="open=!open">
-    <q-btn fab icon="mdi-layers" class="toolButton" :class="{ active: open }"/>
+  <q-page-sticky position="bottom" class="q-px-md q-py-md" @click="open = !open">
+    <q-btn fab icon="mdi-layers" class="toolButton" :class="{ active: open }" />
   </q-page-sticky>
   <KeepAlive>
     <q-card v-if="open" square class="regular-card">
@@ -9,7 +9,8 @@
           <div class="column">
             <div v-for="layer in bgl" :key="layer.NAME">
               <div class="col-3 col-sm-10 layer-column">
-                <q-btn :ref=layer.NAME round class="layer-roud-button" :class="{ 'active': selectedBackground[layer.NAME] }" @click="changeLayer(layer.NAME)">
+                <q-btn :ref=layer.NAME round class="layer-roud-button"
+                  :class="{ 'active': selectedBackground[layer.NAME] }" @click="changeLayer(layer.NAME)">
                   <q-avatar size="70px" class="layer-roud-avatar">
                     <img v-if="layer.TOKEN" :src="`${layer.IMG}access-token=${layer.TOKEN}`">
                     <img v-else :src="`${layer.IMG}`">
@@ -50,7 +51,7 @@ function changeLayer(layer: string): void {
     mapStore.getLayerByName(background.NAME)?.setVisible(false)
   })
   mapStore.getLayerByName(layer)?.setVisible(true)
-  selectedBackground.value = { [layer] : true };
+  selectedBackground.value = { [layer]: true };
 }
 </script>
 
@@ -104,4 +105,3 @@ function changeLayer(layer: string): void {
 .layer-roud-avatar
   margin: 2px
 </style>
-../../stores/mapStore/map-store

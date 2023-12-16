@@ -1,14 +1,17 @@
 import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile'
 import XYZ from 'ol/source/XYZ';
-import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS, DEFAULT_STYLE } from './enum'
+import { BACKGROUND_LAYERS_SETTINGS, VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS, DEFAULT_STYLE, RASTER_LAYERS_SETTINGS } from './enum'
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
+import { Image as ImageLayer } from 'ol/layer';
+import ImageWMS from 'ol/source/ImageWMS';
 import MVT from 'ol/format/MVT';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
 import { Style, Fill, Stroke } from 'ol/style';
+import { CONNECTION_PROPERTIES } from 'src/services/Api/enum';
 
 /**
  * Gestionnaire de couches
@@ -22,7 +25,9 @@ class MapLayers {
     this.addBackgroundLayers();
     this.addVectorLayers();
     this.addVectorTileLayers();
+    this.addRasterLayers();
   }
+
 
   /**
    * ajout des fonds de plan
@@ -49,6 +54,7 @@ class MapLayers {
     }
   }
 
+
   /**
    * ajout des couches vectorielles
    */
@@ -70,11 +76,11 @@ class MapLayers {
     }
   }
 
+
   /**
    * ajout des couche tuiles vectorielles
    */
   async addVectorTileLayers(): Promise<void> {
-
     // Requêtage des styles
     const ArrayStyles = await ApiRequestor.getStyles();
 
@@ -110,7 +116,10 @@ class MapLayers {
           zIndex: vtl.ZINDEX,
           properties: {
             'name': vtl.NAME,
-            'selectionnable': vtl.SELECTIONNABLE
+            'title': vtl.TITLE,
+            'description': vtl.DESCRIPTION,
+            'selectionnable': vtl.SELECTIONNABLE,
+            'editable': vtl.EDITABLE
           },
           preload: Infinity,
           renderMode: 'hybrid',
@@ -138,6 +147,33 @@ class MapLayers {
           })
         )
       }
+    }
+  }
+
+
+  /**
+   * Fonction d'ajout des rasters
+   */
+  private addRasterLayers(): void {
+    for (const layer in RASTER_LAYERS_SETTINGS) {
+      const rl = RASTER_LAYERS_SETTINGS[layer]
+      this.map.addLayer(
+        new ImageLayer({
+          source: new ImageWMS({
+            url: `${CONNECTION_PROPERTIES.GEOSERVER.URL}/wms?`,
+            params: { 'LAYERS': `${rl.NAME}` },
+            hidpi: false
+          }),
+          properties: {
+            'name': rl.NAME,
+            'title': rl.TITLE,
+            'description': rl.DESCRIPTION,
+            'editable': rl.EDITABLE
+          },
+          zIndex: rl.ZINDEX,
+          visible: rl.VISIBLE
+        })
+      )
     }
   }
 }

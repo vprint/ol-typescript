@@ -1,4 +1,4 @@
-import { IBackgroundLayerSettings, IVectorLayerSettings, IVectorTileLayerSettings } from './types'
+import { IBackgroundLayerSettings, IVectorLayerSettings, IVectorTileLayerSettings, IRasterLayerSettings } from './types'
 import { HIDDEN_TOKEN } from './key'
 
 export const BACKGROUND_LAYERS_SETTINGS: IBackgroundLayerSettings = {
@@ -49,22 +49,45 @@ export const BACKGROUND_LAYERS_SETTINGS: IBackgroundLayerSettings = {
 
 export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
   CARTOGRAPHY_LAYER: {
-    ZINDEX: 3,
+    ZINDEX: 4,
     NAME: 'Features',
+    TITLE: 'Features',
+    DESCRIPTION: 'Cartographie des entités archéologiques découverte dans le cadre des programmes KALC et CALI. La cartographie à été réalisée par l\'EFEO',
     VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
     SELECTIONNABLE: true,
-    TYPE_ID: 'id_typology'
+    TYPE_ID: 'id_typology',
+    EDITABLE: true
   },
 }
 
 export const VECTOR_LAYERS_SETTINGS: IVectorLayerSettings = {
   EDITION_LAYER: {
-    ZINDEX: 4,
+    ZINDEX: 5,
     NAME: 'Edition',
     SELECTIONNABLE: false,
     VISIBLE: false
   },
+}
+
+
+export const RASTER_LAYERS_SETTINGS: IRasterLayerSettings = {
+  DEM: {
+    ZINDEX: 2,
+    NAME: 'ArchaeoSpringMap:DEM',
+    TITLE: 'Elevation',
+    DESCRIPTION: 'Couche d\'élévation obtenue à partir d\'une interpolation des données LiDAR',
+    VISIBLE: true,
+    EDITABLE: true
+  },
+  SVF: {
+    ZINDEX: 3,
+    NAME: 'ArchaeoSpringMap:SVF',
+    TITLE: 'Sky-View-Factor',
+    DESCRIPTION: 'Le Sky-View-Factor est une méthode de visualisation des données altimétrique apprécié des archéologue. Elle permet de visualiser les zones enclavées dans des teintes sombres et les zones surélevées dans des teintes claires',
+    VISIBLE: false,
+    EDITABLE: true
+  }
 }
 
 export const DEFAULT_STYLE = {

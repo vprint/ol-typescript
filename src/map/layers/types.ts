@@ -23,12 +23,15 @@ export type IBackgroundLayerSettings = Record<string, IBackgroundLayerType>
 // Interface des tuiles vectorielles
 export interface IVectorTileLayerType {
   NAME: string;
+  TITLE: string;
+  DESCRIPTION: string;
   ZINDEX: number;
   ATTRIBUTION?: string[];
   VISIBLE: boolean;
   URL?: string;
   SELECTIONNABLE: boolean;
   TYPE_ID: string;
+  EDITABLE: boolean;
 }
 export type IVectorTileLayerSettings = Record<string, IVectorTileLayerType>
 
@@ -42,3 +45,16 @@ export interface IVectorLayerType {
   VISIBLE: boolean;
 }
 export type IVectorLayerSettings = Record<string, IVectorLayerType>
+
+
+
+// Interface des couches rasters
+export interface IRasterLayerType {
+  NAME: string;
+  TITLE: string;
+  DESCRIPTION: string;
+  VISIBLE: boolean;
+  ZINDEX: number;
+  EDITABLE: boolean;
+}
+export type IRasterLayerSettings = Record<string, IRasterLayerType>

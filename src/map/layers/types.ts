@@ -56,5 +56,6 @@ export interface IRasterLayerType {
   VISIBLE: boolean;
   ZINDEX: number;
   EDITABLE: boolean;
+  DYNAMIC: boolean
 }
 export type IRasterLayerSettings = Record<string, IRasterLayerType>

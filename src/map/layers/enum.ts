@@ -74,19 +74,21 @@ export const VECTOR_LAYERS_SETTINGS: IVectorLayerSettings = {
 export const RASTER_LAYERS_SETTINGS: IRasterLayerSettings = {
   DEM: {
     ZINDEX: 2,
-    NAME: 'ArchaeoSpringMap:DEM',
+    NAME: 'DEM',
     TITLE: 'Elevation',
     DESCRIPTION: 'Couche d\'élévation obtenue à partir d\'une interpolation des données LiDAR',
     VISIBLE: true,
-    EDITABLE: true
+    EDITABLE: true,
+    DYNAMIC: true
   },
   SVF: {
     ZINDEX: 3,
-    NAME: 'ArchaeoSpringMap:SVF',
+    NAME: 'SVF',
     TITLE: 'Sky-View-Factor',
-    DESCRIPTION: 'Le Sky-View-Factor est une méthode de visualisation des données altimétrique apprécié des archéologue. Elle permet de visualiser les zones enclavées dans des teintes sombres et les zones surélevées dans des teintes claires',
+    DESCRIPTION: 'Le Sky-View-Factor est une méthode de visualisation des données altimétrique appréciée des archéologue. Elle permet de visualiser les zones enclavées dans des teintes sombres et les zones surélevées dans des teintes claires',
     VISIBLE: false,
-    EDITABLE: true
+    EDITABLE: true,
+    DYNAMIC: false
   }
 }
 

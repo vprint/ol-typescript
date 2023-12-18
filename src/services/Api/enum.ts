@@ -12,8 +12,12 @@ export const CONNECTION_PROPERTIES = {
       SERVICE_PREFIX: 'ArchaeoSpringMap',
       NAME: 'FEATURES',
     },
-    ERROR: 'Le geo-serveur est indisponible. Contactez l\'administrateur',
+    ERROR: 'Le geo-serveur (GS) est indisponible. Contactez l\'administrateur',
   },
+  QGIS_SERVER: {
+    URL: 'http://localhost:8081/cgi-bin/qgis_mapserv.fcgi.exe?',
+    ERROR: 'Le geo-serveur (QGS) est indisponible. Contactez l\'administrateur',
+  }
 };
 
 export const USER_MESSAGE = {

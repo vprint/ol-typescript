@@ -55,6 +55,7 @@ class MapLayers {
   }
 
 
+
   /**
    * ajout des couches vectorielles
    */
@@ -160,15 +161,17 @@ class MapLayers {
       this.map.addLayer(
         new ImageLayer({
           source: new ImageWMS({
-            url: `${CONNECTION_PROPERTIES.GEOSERVER.URL}/wms?`,
+            url: `${CONNECTION_PROPERTIES.QGIS_SERVER.URL}/wms?`,
             params: { 'LAYERS': `${rl.NAME}` },
-            hidpi: false
+            hidpi: false,
+            ratio: 1
           }),
           properties: {
             'name': rl.NAME,
             'title': rl.TITLE,
             'description': rl.DESCRIPTION,
-            'editable': rl.EDITABLE
+            'editable': rl.EDITABLE,
+            'dynamic': rl.DYNAMIC
           },
           zIndex: rl.ZINDEX,
           visible: rl.VISIBLE

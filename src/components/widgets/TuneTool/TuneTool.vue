@@ -19,9 +19,9 @@
 
 
               <div class="up-down-buttons">
-                <q-btn flat square icon="sym_o_keyboard_double_arrow_up" :disable="layer.getZIndex() === maxZIndex"
+                <q-btn flat square icon="sym_o_keyboard_double_arrow_up" :disable="layer.getZIndex() === maxIndex"
                   @click="setLayerIndex(layer, 1)" />
-                <q-btn flat square icon="sym_o_keyboard_double_arrow_down" :disable="layer.getZIndex() === minZIndex"
+                <q-btn flat square icon="sym_o_keyboard_double_arrow_down" :disable="layer.getZIndex() === minIndex"
                   @click="setLayerIndex(layer, -1)" />
               </div>
 
@@ -56,14 +56,14 @@ import { Layer } from 'ol/layer';
 
 const mapStore = useMapStore()
 const editableLayers = getEditableLayers()
-const zIndexList = editableLayers.map(layer => layer.getZIndex()!)
-const maxZIndex = Math.max(...zIndexList)
-const minZIndex = Math.min(...zIndexList)
+const IndexList = editableLayers.map(layer => layer.getZIndex()!)
+const maxIndex = Math.max(...IndexList)
+const minIndex = Math.min(...IndexList)
 const layersOpacities: Ref<ILayersOpacities> = ref({})
 const layersVisibilities: Ref<ILayersVisibilities> = ref({})
 
 const sortedEditableLayers = computed(() => {
-  return sortLayersByZIndex(editableLayers)
+  return sortLayersByIndex(editableLayers)
 })
 
 
@@ -94,7 +94,7 @@ function getLayersVisibilities(): void {
  * Fonction de tri des couches par leurs valeurs Z-index
  * @param layerlist Liste des couches à trier
  */
-function sortLayersByZIndex(layerlist: Layer[]): Layer[] {
+function sortLayersByIndex(layerlist: Layer[]): Layer[] {
   layerlist.sort((a, b) => b.getZIndex()! - a.getZIndex()!)
   return layerlist
 }
@@ -120,7 +120,7 @@ function setLayerIndex(layer: Layer, index: number): void {
   const layerIndex = layer.getZIndex()!
   const targetIndex = layerIndex + (index)
 
-  getLayerAtZIndex(targetIndex).forEach(l => l.setZIndex(l.getZIndex()! + index * (-1)))
+  getLayerAtIndex(targetIndex).forEach(l => l.setZIndex(l.getZIndex()! + index * (-1)))
   layer.setZIndex(targetIndex)
 }
 
@@ -130,7 +130,7 @@ function setLayerIndex(layer: Layer, index: number): void {
  * Récupération des layers pour un Z-index donné
  * @param index valeur de Z-index
  */
-function getLayerAtZIndex(index: number): Layer[] {
+function getLayerAtIndex(index: number): Layer[] {
   return editableLayers.filter(layer => layer.getZIndex() === index)
 }
 

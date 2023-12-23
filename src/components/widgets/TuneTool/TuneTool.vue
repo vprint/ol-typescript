@@ -4,20 +4,27 @@
       Tuning
     </template>
     <template #component>
+      <!-- Transitionneur -->
       <transition-group tag="div" name="fade" class="container">
+
+        <!-- Conteneur général + titre -->
         <div v-for="layer in sortedEditableLayers" :key="layer.get('name')">
           <div class="layer-div">
-
             <p class="merriweather">{{ layer.get('title') }}</p>
 
+
+            <!-- Controlleur de couche -->
             <div class="layer-control">
 
+              <!-- Checkbox de visibilité -->
               <q-checkbox v-model="layersVisibilities[layer.get('name')]" checked-icon="sym_o_visibility"
                 unchecked-icon="sym_o_visibility_off" @click="layer.setVisible(!layer.getVisible())" size="xl" />
+
+              <!-- Slider d'opacité -->
               <q-slider v-model="layersOpacities[layer.get('name')]" :min="0" :max="1" :step="0.01"
                 @update:model-value="value => layer.setOpacity(value as number)" :disable="!layer.getVisible()" />
 
-
+              <!-- Modificateur d'index de couche-->
               <div class="up-down-buttons">
                 <q-btn flat square icon="sym_o_keyboard_double_arrow_up" :disable="layer.getZIndex() === maxIndex"
                   @click="setLayerIndex(layer, 1)" />
@@ -27,12 +34,28 @@
 
             </div>
 
-            <q-expansion-item label="Description" class="merriweather">
-              <q-card>
-                <q-card-section class="description-card merriweather">
-                  {{ layer.get('description') }}
-                </q-card-section>
-              </q-card>
+            <!-- Accordéon de détail + légende -->
+            <q-expansion-item caption="Information et légende" class="merriweather">
+
+              <!-- Description générale de la couche -->
+              <q-expansion-item expand-separator switch-toggle-side dense-toggle label="Description"
+                class="secondary-text" :content-inset-level="0.5">
+                <q-card>
+                  <q-card-section class="description-card tertiary-text">
+                    {{ layer.get('description') }}
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+
+              <!-- Légende de la couche -->
+              <q-expansion-item switch-toggle-side dense-toggle label=" Légende" class="secondary-text"
+                :content-inset-level="0.5">
+                <q-card>
+                  <q-card-section class="description-card tertiary-text">
+                    <LegendTool :layer="layer" />
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
             </q-expansion-item>
 
           </div>
@@ -50,9 +73,11 @@
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { onMounted, ref, Ref, computed } from 'vue';
+import LegendTool from '../LegendTool/LegendTool.vue';
 
 import { ILayersOpacities, ILayersVisibilities } from './types'
 import { Layer } from 'ol/layer';
+
 
 const mapStore = useMapStore()
 const editableLayers = getEditableLayers()
@@ -172,4 +197,15 @@ onMounted(() => {
 
 .fade-leave-active
   position: absolute
+
+.secondary-text
+  font-size: 0.75rem
+  font-weight: 400
+  line-height: 1.25rem
+  letter-spacing: 0.03333em
+  color: rgba(0, 0, 0, 0.54)
+
+.tertiary-text
+  font-size: 0.75rem
+  font-weight: 400
 </style>

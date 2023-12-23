@@ -21,16 +21,9 @@ export const toolbarWidgets: IWidgets = {
     icon: 'handyman',
     tooltip: 'Processings'
   },
-  InformationTool: {
-    tool: markRaw(InformationTool) as DefineComponent,
-    width: '400px',
-    title: 'InformationTool',
-    icon: 'info',
-    tooltip: 'Information'
-  },
   TuneTool: {
     tool: markRaw(TuneTool) as DefineComponent,
-    width: '400px',
+    width: '470px',
     title: 'TuneTool',
     icon: 'sym_o_tune',
     tooltip: 'Customization'

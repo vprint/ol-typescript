@@ -83,7 +83,7 @@ class MapLayers {
    */
   async addVectorTileLayers(): Promise<void> {
     // Requêtage des styles
-    const ArrayStyles = await ApiRequestor.getStyles();
+    const styles = await ApiRequestor.getStyles();
 
     // Style par défaut
     const defaultStyle: Style = new Style({
@@ -99,7 +99,7 @@ class MapLayers {
     // Itération sur les couches vectorielles tuilées
     for (const layer in VECTOR_TILE_LAYERS_SETTINGS) {
       const vtl = VECTOR_TILE_LAYERS_SETTINGS[layer]
-      const layerStyle = (ArrayStyles ? ArrayStyles[vtl.NAME] : null)
+      const layerStyle = (styles ? styles[vtl.NAME] : null)
 
       // Création de la source
       const vectorTileSource = new VectorTileSource({

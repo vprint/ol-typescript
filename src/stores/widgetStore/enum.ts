@@ -1,4 +1,3 @@
-import InformationTool from '../../components/widgets/InformationTool/InformationTool.vue';
 import FeaturesTool from '../../components/widgets/FeaturesTool/FeaturesTool.vue';
 import ProcessingTool from '../../components/widgets/ProcessingTool/ProcessingTool.vue';
 import TuneTool from '../../components/widgets/TuneTool/TuneTool.vue'

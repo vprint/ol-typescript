@@ -72,7 +72,6 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
   );
 
   const styleArray: ILayersStyles = {}
-
   if (result === undefined) {
     return undefined
   }

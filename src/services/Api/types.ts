@@ -10,8 +10,8 @@ export interface ISQLStyles {
   stroke_width: number,
   layer_name: string
 }
-export type ILayersStyles = Record<string, Style[]>
 
+export type ILayersStyles = Record<string, Style[]>
 
 export interface ISQLTypologies {
   typology_name: string,
@@ -19,6 +19,7 @@ export interface ISQLTypologies {
   id_typology: number,
   geom_type: string
 }
+
 export type ITypologies = ISQLTypologies[]
 
 export interface IWFSResult {

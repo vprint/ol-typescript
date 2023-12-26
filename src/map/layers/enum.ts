@@ -51,7 +51,7 @@ export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
   CARTOGRAPHY_LAYER: {
     ZINDEX: 4,
     NAME: 'Features',
-    TITLE: 'Features',
+    TITLE: 'Cartgraphie',
     DESCRIPTION: 'Cartographie des entités archéologiques découverte dans le cadre des programmes KALC et CALI. La cartographie à été réalisée par l\'EFEO',
     VISIBLE: true,
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',

@@ -80,7 +80,7 @@ async function getStyles(): Promise<ILayersStyles | undefined> {
       // Création d'un array pour chaque couche différente de la réponse
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!styleArray[style.layer_name]) {
-        styleArray[style.layer_name] = []
+        styleArray[style.layer_name] = {}
       }
 
       // Création du style pour chaque id_typology.

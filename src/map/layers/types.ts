@@ -53,6 +53,7 @@ export interface IRasterLayerType {
   NAME: string;
   TITLE: string;
   DESCRIPTION: string;
+  ATTRIBUTION: string[]
   VISIBLE: boolean;
   ZINDEX: number;
   EDITABLE: boolean;

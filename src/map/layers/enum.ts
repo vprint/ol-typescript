@@ -57,7 +57,8 @@ export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
     URL: 'http://localhost:6767/ANGKOR_QUALIF_TILESET',
     SELECTIONNABLE: true,
     TYPE_ID: 'id_typology',
-    EDITABLE: true
+    EDITABLE: true,
+    ATTRIBUTION: ['Données cartographiques | <b>EFEO</b>']
   },
 }
 
@@ -77,6 +78,7 @@ export const RASTER_LAYERS_SETTINGS: IRasterLayerSettings = {
     NAME: 'DEM',
     TITLE: 'Elevation',
     DESCRIPTION: 'Couche d\'élévation obtenue à partir d\'une interpolation des données LiDAR',
+    ATTRIBUTION: ['Données LiDAR | <b>EFEO</b>'],
     VISIBLE: true,
     EDITABLE: true,
     DYNAMIC: true
@@ -86,6 +88,7 @@ export const RASTER_LAYERS_SETTINGS: IRasterLayerSettings = {
     NAME: 'SVF',
     TITLE: 'Sky-View-Factor',
     DESCRIPTION: 'Le Sky-View-Factor est une méthode de visualisation des données altimétrique appréciée des archéologue. Elle permet de visualiser les zones enclavées dans des teintes sombres et les zones surélevées dans des teintes claires',
+    ATTRIBUTION: ['Données LiDAR | <b>EFEO</b>'],
     VISIBLE: false,
     EDITABLE: true,
     DYNAMIC: false

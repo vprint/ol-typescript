@@ -120,7 +120,8 @@ class MapLayers {
             'title': vtl.TITLE,
             'description': vtl.DESCRIPTION,
             'selectionnable': vtl.SELECTIONNABLE,
-            'editable': vtl.EDITABLE
+            'editable': vtl.EDITABLE,
+            'type_id': vtl.TYPE_ID
           },
           preload: Infinity,
           renderMode: 'hybrid',
@@ -164,7 +165,8 @@ class MapLayers {
             url: `${CONNECTION_PROPERTIES.QGIS_SERVER.URL}/wms?`,
             params: { 'LAYERS': `${rl.NAME}` },
             hidpi: false,
-            ratio: 1
+            ratio: 1,
+            attributions: rl.ATTRIBUTION
           }),
           properties: {
             'name': rl.NAME,

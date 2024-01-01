@@ -123,7 +123,7 @@
     </template>
 
     <template #external>
-      <DrawTool v-if="drawMode !== ''" :draw-mode="drawMode" :feature-id="featureId">
+      <DrawTool v-if="drawMode !== ''" :draw-mode="drawMode" :feature-id="featureId" :pending-state="pendingTransaction">
       </DrawTool>
     </template>
   </RegularWidget>
@@ -144,7 +144,7 @@ import DrawTool from '../DrawTool/DrawTool.vue';
 import { VECTOR_LAYERS_SETTINGS, VECTOR_TILE_LAYERS_SETTINGS } from 'src/map/layers/enum';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import { ITransactionMode } from 'src/services/TransactionServices/type';
-import { IDrawMode } from '../DrawTool/type';
+import { IDrawMode } from '../DrawTool/types';
 
 
 const step = ref(1)
@@ -209,12 +209,12 @@ async function enableModification(feature: FeatureLike): Promise<void> {
 
 
 
-
+/**
+ * Fonction de récupération de la valeur d'insertion par défaut
+ */
 async function setinsertType(): Promise<void> {
   const typologies = await typologiesRaw
-  console.log('exec')
   insertType.value = typologies?.find((element) => element.id_typology === 0)
-  console.log(insertType.value)
 }
 
 
@@ -236,6 +236,8 @@ async function serverTransaction(mode: ITransactionMode): Promise<void> {
   } else {
     feature?.set('id_typology', insertType.value?.id_typology);
   }
+
+
 
 
   // Execution de la transaction

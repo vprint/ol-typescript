@@ -1,7 +1,7 @@
 <template>
   <div class="drawer no-shadow" style="font-size: 2em;">
     <q-list>
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Polygon')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Polygon')" :disable="pendingState">
         <q-item-section avatar>
           <q-icon name="sym_o_pentagon" />
         </q-item-section>
@@ -11,7 +11,8 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('LineString')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('LineString')"
+        :disable="pendingState">
         <q-item-section avatar>
           <q-icon name="sym_o_timeline" />
         </q-item-section>
@@ -21,7 +22,7 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Circle')">
+      <q-item v-if="drawMode === 'addFeature'" clickable @click="addDrawInteraction('Circle')" :disable="pendingState">
         <q-item-section avatar>
           <q-icon name="sym_o_circle" />
         </q-item-section>
@@ -33,7 +34,7 @@
 
       <q-separator v-if="drawMode === 'addFeature'" />
 
-      <q-item clickable :disable="disableUndo" @click='undo'>
+      <q-item clickable :disable="disableUndo || pendingState" @click='undo'>
         <q-item-section avatar>
           <q-icon name="sym_o_undo" />
         </q-item-section>
@@ -43,7 +44,7 @@
         </q-tooltip>
       </q-item>
 
-      <q-item clickable :disable="disableRedo" @click="redo">
+      <q-item clickable :disable="disableRedo || pendingState" @click="redo">
         <q-item-section avatar>
           <q-icon name="sym_o_redo" />
         </q-item-section>
@@ -65,7 +66,7 @@
         </q-tooltip>
       </q-item>
 
-      <q-item v-if="drawMode !== 'modifyFeature'" clickable @click="clearFeature">
+      <q-item v-if="drawMode !== 'modifyFeature'" clickable @click="clearFeature" :disable="pendingState">
         <q-item-section avatar>
           <q-icon name="sym_o_delete" />
         </q-item-section>
@@ -75,6 +76,12 @@
         </q-tooltip>
       </q-item>
 
+      <q-item v-if="pendingState">
+        <q-item-section avatar>
+          <q-spinner-facebook />
+        </q-item-section>
+      </q-item>
+
     </q-list>
   </div>
 </template>
@@ -82,7 +89,7 @@
 
 <script setup lang="ts">
 import { Draw, Modify } from 'ol/interaction';
-import { IDrawMode } from './type';
+import { IDrawMode } from './types';
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { VECTOR_LAYERS_SETTINGS } from 'src/map/layers/enum';
 import VectorLayer from 'ol/layer/Vector';
@@ -103,7 +110,8 @@ const disableRedo = ref(true)
 
 const props = defineProps<{
   drawMode: IDrawMode,
-  featureId: string | number | undefined
+  featureId: string | number | undefined,
+  pendingState: boolean
 }>();
 
 // Ajout de l'interaction retour/refaire
@@ -112,9 +120,11 @@ const undoRedo = new UndoRedo({
 })
 undoRedo.set('name', 'undoRedoInteraction')
 
-let drawInteraction: Draw
-let modifyInteraction: Modify
+let drawInteraction: Draw | undefined
+let modifyInteraction: Modify | undefined
 let fullFeature: FeatureLike | RenderFeature[] | undefined
+
+
 
 /**
  * Fonction d'ajout de géométrie
@@ -139,6 +149,8 @@ function addDrawInteraction(drawMode: Type): void {
   })
 }
 
+
+
 /**
  * Ajout de l'interaction de modification
  */
@@ -158,6 +170,8 @@ function addModifyInteraction(): void {
   })
 }
 
+
+
 /**
  * Fonction de suppression des features de la couche d'édition
  */
@@ -168,6 +182,8 @@ function clearFeature(): void {
   disableUndo.value = true
   disableRedo.value = true
 }
+
+
 
 /**
  * Fonction annuler/retour
@@ -180,6 +196,8 @@ function undo(): void {
   }
 }
 
+
+
 /**
  * Retour refaire
  */
@@ -190,6 +208,8 @@ function redo(): void {
     disableRedo.value = true
   }
 }
+
+
 
 /**
  * Function de localisation de l'objet édité
@@ -206,6 +226,8 @@ function locate(): void {
   }
 }
 
+
+
 /**
  * Fonction de récupération de l'entité à éditer
  */
@@ -215,6 +237,8 @@ async function initializeFeature(): Promise<void> {
   // @ts-ignore
   fullFeature ? editionLayerSource?.addFeature(fullFeature) : null
 }
+
+
 
 /**
  * Gestion du montage du composant
@@ -227,7 +251,6 @@ onMounted(() => {
   }
   mapStore.map?.addInteraction(undoRedo)
 })
-
 
 
 
@@ -245,16 +268,14 @@ onUnmounted(() => {
 
 
 
-
 /**
  * Gestion de la desactivation du composant
  */
 onDeactivated(() => {
-  modifyInteraction.setActive(false)
-  drawInteraction.setActive(false)
+  modifyInteraction?.setActive(false)
+  drawInteraction?.setActive(false)
   editionLayer.setVisible(false)
 });
-
 
 
 
@@ -262,8 +283,8 @@ onDeactivated(() => {
  * Gestion de l'activation du composant
  */
 onActivated(() => {
-  modifyInteraction.setActive(true)
-  drawInteraction.setActive(true)
+  modifyInteraction?.setActive(true)
+  drawInteraction?.setActive(true)
   editionLayer.setVisible(true)
 });
 

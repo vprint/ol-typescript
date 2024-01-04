@@ -1,23 +1,23 @@
 <template>
-  <q-img :src="legendUrl" height="80px" fit="scale-down" position="0 0" :no-spinner="true" class="img-legend"></q-img>
+  <q-img :src="(WMSLegendUrl)" height="90px" fit="scale-down" position="0 0" :no-spinner="true" class="img-legend">
+  </q-img>
 </template>
 
 <script setup lang="ts">
-import { Layer } from 'ol/layer';
+
+import Layer from 'ol/layer/Layer';
 import ImageLayer from 'ol/layer/Image';
 import ImageWMS from 'ol/source/ImageWMS';
+
 import { useMapStore } from 'src/stores/mapStore/map-store';
 import { onBeforeMount, ref } from 'vue'
 
-
-
-const legendUrl = ref('')
 const mapStore = useMapStore()
+const WMSLegendUrl = ref('')
+
 const props = defineProps<{
-  layer: Layer
+  layer: ImageLayer<ImageWMS>
 }>();
-
-
 
 // Paramètre de légende WMS
 const wmsLegendParameters = {
@@ -27,6 +27,7 @@ const wmsLegendParameters = {
   'SYMBOLHEIGHT': 25,
   'LAYERTITLE': false,
   'RULELABEL': false,
+  'ICONLABELSPACE': 5,
   'LAYERFONTSIZE': 0,
   'ITEMFONTSIZE': 0
 }
@@ -37,18 +38,14 @@ const wmsLegendParameters = {
  * Récupération des légendes
  * @param wmsLayer Couche à légender
  */
-function getLegend(inputLayer: Layer): string {
-  // Source WMS
-  if (inputLayer.getSource() instanceof ImageWMS) {
-    // Définition des variables de requête.
-    const imgWms = inputLayer.getSource() as ImageWMS
-    return imgWms.getLegendUrl(undefined, wmsLegendParameters)!
-  }
+async function getLegend(inputLayer: Layer): Promise<string> {
+  let legendUrl: string
 
-  // Source vectorielle
-  else {
-    return 'https://i.pinimg.com/originals/a2/69/81/a2698150fcb84ecca19b7118a02dc484.gif'
-  }
+  // Définition des variables de requête.
+  const imgWms = inputLayer.getSource() as ImageWMS
+  legendUrl = imgWms.getLegendUrl(undefined, wmsLegendParameters)!
+
+  return legendUrl
 }
 
 
@@ -81,7 +78,7 @@ function getDynamicWMSLegend(wmsLayer: Layer): string {
  */
 function refreshLegend(wmsLayer: ImageLayer<ImageWMS>): void {
   wmsLayer.getSource()?.on('imageloadend', () => {
-    legendUrl.value = getDynamicWMSLegend(wmsLayer)
+    WMSLegendUrl.value = getDynamicWMSLegend(wmsLayer)
   })
 }
 
@@ -91,7 +88,10 @@ function refreshLegend(wmsLayer: ImageLayer<ImageWMS>): void {
  * Initialisation des valeurs de légende
  */
 onBeforeMount(() => {
-  legendUrl.value = getLegend(props.layer)
+  async function initializeValues(): Promise<void> {
+    WMSLegendUrl.value = await getLegend(props.layer)
+  }
+  initializeValues()
 })
 
 
@@ -99,7 +99,7 @@ onBeforeMount(() => {
 /**
  * Rafraichissement des couches dynamiques
  */
-if (props.layer.get('dynamic') && props.layer instanceof ImageLayer) {
+if (props.layer.get('dynamic')) {
   refreshLegend(props.layer)
 }
 

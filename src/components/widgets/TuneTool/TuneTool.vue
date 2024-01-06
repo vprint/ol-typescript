@@ -52,7 +52,8 @@
                 :content-inset-level="0.5">
                 <q-card>
                   <q-card-section class="description-card tertiary-text">
-                    <LegendTool :layer="layer" />
+                    <RasterLegendTool v-if="(layer instanceof ImageLayer)" :layer="layer" />
+                    <VectorLegendTool v-if="(layer instanceof VectorTileLayer)" :layer="layer" />
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
@@ -77,6 +78,10 @@ import LegendTool from '../LegendTool/LegendTool.vue';
 
 import { ILayersOpacities, ILayersVisibilities } from './types'
 import { Layer } from 'ol/layer';
+import RasterLegendTool from '../RasterLegendTool/RasterLegendTool.vue';
+import ImageLayer from 'ol/layer/Image';
+import VectorLegendTool from '../VectorLegendTool/VectorLegendTool.vue';
+import VectorTileLayer from 'ol/layer/VectorTile';
 
 
 const mapStore = useMapStore()

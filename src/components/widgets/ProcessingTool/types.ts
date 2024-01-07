@@ -1,4 +1,4 @@
-import { FeatureCollection, Geometry } from 'geojson';
+import { FeatureCollection, LineString } from 'geojson';
 
 export interface OAProcessesInputPolygon {
   InputPolygon: {
@@ -36,7 +36,7 @@ export interface OAProcessesResult {
 
 export interface OAProcessesProfileResult {
   Profile: {
-    value: Geometry
+    value: LineString
   }
 }
 

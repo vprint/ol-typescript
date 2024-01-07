@@ -14,7 +14,7 @@
         @click="executeProcesses()" />
 
       <div>
-        <VueApexCharts width="350" type="bar" :options="chartOptions" :series="series"></VueApexCharts>
+        <VueApexCharts v-if="initialized" width="100%" :options="apexChartOptions" :series="topographicData.series" />
       </div>
     </template>
 
@@ -40,11 +40,12 @@ import { OAProcessesResult, OAProcessesBuffer, OAProcessesCentroid, OAProcessesP
 import wretch from 'wretch'
 import Notifier from 'src/services/Notifier/Notifier';
 import { CONNECTION_PROPERTIES, USER_MESSAGE } from '../../../services/Api/enum';
-import { onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
+import { onActivated, onDeactivated, onMounted, onUnmounted, ref, Ref } from 'vue';
 import { FeatureCollection } from 'geojson';
 import DrawTool from '../DrawTool/DrawTool.vue';
 import RenderFeature from 'ol/render/Feature';
-import VueApexCharts from "vue3-apexcharts";
+import VueApexCharts from 'vue3-apexcharts';
+import { ApexOptions } from 'apexcharts';
 
 
 
@@ -52,32 +53,105 @@ const mapStore = useMapStore()
 const selectedProcess = ref('')
 const editionLayer = mapStore.getLayerByName(VECTOR_LAYERS_SETTINGS.EDITION_LAYER.NAME) as VectorLayer<VectorSource>
 const editionLayerSource = editionLayer.getSource()
-const chartOptions = ref({
+let apexChartOptions: ApexOptions = {
+
+  // Définition du type de graphique
   chart: {
-    type: 'area',
-    stacked: false,
-    height: 350,
-    id: 'vuechart-example',
-    zoom: {
-      type: 'x',
-      enabled: true,
-      autoScaleYaxis: true
+    type: 'area'
+  },
+
+  // Définition du trait du graphique
+  stroke: {
+    width: 1,
+    colors: ['#8a1946']
+  },
+
+  // Paramètres de l'axe x
+  xaxis: {
+    categories: [],
+    labels: {
+      show: false
     },
-    toolbar: {
-      autoSelected: 'zoom'
+    tooltip: {
+      enabled: false
+    },
+    axisBorder: {
+      show: false
+    },
+    axisTicks: {
+      show: false
     }
   },
-  xaxis: {
-    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
-  },
-})
-const series = [
-  {
-    name: 'series-1',
-    data: [30, 40, 35, 50, 49, 60, 70, 91],
-  },
-]
 
+  // Parmètres de l'axe y
+  yaxis: {
+    decimalsInFloat: 0,
+    title: {
+      text: 'Altitude',
+      style: {
+        fontFamily: 'merriweather'
+      }
+    },
+    labels: {
+      style: {
+        fontFamily: 'merriweather'
+      }
+    }
+  },
+
+  // Paramètre du marker (point sur la ligne lors du survol)
+  markers: {
+    colors: '#8a1946',
+    hover: {
+      size: 5
+    }
+  },
+
+
+  // Paramètre des tooltip (fenêtre affichée à coté du point sur la ligne)
+  tooltip: {
+    x: {
+      show: false
+    },
+    y: {
+      formatter: (val) => {
+        return `${val.toFixed(2)}m`
+      }
+    },
+    style: {
+      fontFamily: 'merriweather'
+    },
+    marker: {
+      fillColors: ['#8a1946']
+    }
+  },
+
+  dataLabels: {
+    enabled: false
+  },
+
+  // Dégradé de couleur sous la ligne principale
+  fill: {
+    type: 'gradient',
+    gradient: {
+      opacityFrom: 0.5,
+      opacityTo: 0.1
+    },
+    colors: ['#8a1946']
+  }
+}
+
+const topographicData = ref({
+  series: [{
+    name: 'Elevation',
+    data: [] as number[]
+  }],
+})
+
+const dynamicChart = ref(apexChartOptions)
+
+
+const initialized = ref(false)
 
 
 onMounted(() => {
@@ -270,7 +344,17 @@ async function profileProcesses(feature: string): Promise<void> {
   }
 
   const OAProcessesRequest = await postData<OAProcessesProfileResult>(`${CONNECTION_PROPERTIES.ZOO_SERVER.URL}/GdalExtractProfile`, CONNECTION_PROPERTIES.ZOO_SERVER.ERROR, JSON.stringify(ProfilePayload));
-  console.log(OAProcessesRequest?.Profile.value);
+  let i = 0
+  topographicData.value.series[0].data = []
+  apexChartOptions.xaxis!.categories = []
+
+  for (const coordinate of OAProcessesRequest!.Profile.value.coordinates) {
+    topographicData.value.series![0].data.push(parseFloat(coordinate[2].toFixed(2)))
+    apexChartOptions.xaxis!.categories.push(i)
+    i = i + 1
+  }
+
+  initialized.value = true
 }
 
 

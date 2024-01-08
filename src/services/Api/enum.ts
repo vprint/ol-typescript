@@ -1,5 +1,4 @@
 export const CONNECTION_PROPERTIES = {
-  BASE_URL: 'http://localhost',
   FeatureServer: {
     LandingPage: 'http://localhost:9010/FeatureServer/',
     Collections: 'http://localhost:9010/FeatureServer/collections/',
@@ -17,6 +16,10 @@ export const CONNECTION_PROPERTIES = {
   QGIS_SERVER: {
     URL: 'http://localhost:8081/cgi-bin/qgis_mapserv.fcgi.exe?',
     ERROR: 'Le geo-serveur (QGS) est indisponible. Contactez l\'administrateur',
+  },
+  ZOO_SERVER: {
+    URL: 'http://localhost/ogc-api/processes',
+    ERROR: 'Le serveur de géotraitement (ZOO) est indisponible. Contactez l\'administrateur',
   }
 };
 
@@ -26,5 +29,5 @@ export const USER_MESSAGE = {
   TYPOLOGY_ERROR: 'Erreur lors de la récupération des types',
   BBOX_ERROR: 'Erreur lors de la récupération des emprises',
   FEATURE_ERROR: 'Erreur lors de la récupération de l\'entité',
-  SERVER_ERROR: 'Erreur lors de la requête sur le serveur de données',
+  SERVER_ERROR: 'Erreur lors de la requête sur le serveur de données'
 };

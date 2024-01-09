@@ -16,6 +16,8 @@
     "@quasar/extras": "^1.16.4",
     "@siedlerchr/types-ol-ext": "^3.2.4",
     "@types/geojson": "^7946.0.13",
+    "apexcharts": "^3.45.1",
+    "font-gis": "^1.0.5",
     "ol": "^8.2.0",
     "ol-ext": "^4.0.12",
     "pinia": "^2.0.11",
@@ -23,6 +25,7 @@
     "simple-notify": "^0.5.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
+    "vue3-apexcharts": "^1.4.4",
     "wretch": "^2.7.0"
   },
   "devDependencies": {

@@ -36,10 +36,12 @@ async function getJSON<T>(url: string, errorMsg: string): Promise<T | undefined>
 
 
 
-
 /**
- * Fonction de postage des JSON.
- * @return {JSON} A JSON object.
+ * Fonction de postage des données
+ * @param url Url de la requête
+ * @param errorMsg Message d'erreur en cas d'echec de la requête
+ * @param data Donnée à transmettre au serveur
+ * @returns reponse au format texte
  */
 async function postData<T>(url: string, errorMsg: string, data: string): Promise<T | undefined> {
   const response = wretch(url)

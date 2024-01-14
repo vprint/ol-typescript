@@ -14,7 +14,8 @@
         @click="executeProcesses()" />
 
       <div>
-        <VueApexCharts v-if="initialized" width="100%" :options="apexChartOptions" :series="topographicData.series" />
+        <VueApexCharts v-if="initialized" width="100%" :options="apexChartOptions" :series="topographicData.series"
+          @mouse-move="drawPoint" />
       </div>
     </template>
 
@@ -27,26 +28,56 @@
 <script setup lang="ts">
 
 import 'font-gis/css/font-gis.css'
-import Feature, { FeatureLike } from 'ol/Feature';
+import Feature, {
+  FeatureLike
+} from 'ol/Feature';
 import FeatureSelector from '../FeatureSelector/FeatureSelector.vue';
 import RegularWidget from '../RegularWidget/RegularWidget.vue';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
 import GeoJSON from 'ol/format/GeoJSON';
-import { useMapStore } from 'src/stores/mapStore/map-store';
-import { VECTOR_LAYERS_SETTINGS } from 'src/map/layers/enum';
+import {
+  useMapStore
+} from 'src/stores/mapStore/map-store';
+import {
+  VECTOR_LAYERS_SETTINGS
+} from 'src/map/layers/enum';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { OAProcessesResult, OAProcessesProfileResult } from './types'
 import wretch from 'wretch'
 import Notifier from 'src/services/Notifier/Notifier';
-import { CONNECTION_PROPERTIES, USER_MESSAGE } from '../../../services/Api/enum';
-import { onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
-import { FeatureCollection } from 'geojson';
+import {
+  CONNECTION_PROPERTIES,
+  USER_MESSAGE
+} from '../../../services/Api/enum';
+import {
+  onActivated,
+  onDeactivated,
+  onMounted,
+  onUnmounted,
+  ref
+} from 'vue';
+import {
+  FeatureCollection,
+  Position
+} from 'geojson';
 import DrawTool from '../DrawTool/DrawTool.vue';
 import RenderFeature from 'ol/render/Feature';
 import VueApexCharts from 'vue3-apexcharts';
-import { getBufferPayload, getCentroidPayload, getProfilePayload } from './processConfig';
-import { chartOptions } from './chartConfig';
+import ApexDiscretePoint from 'vue3-apexcharts'
+import ApexOptions from 'vue3-apexcharts'
+import {
+  getBufferPayload,
+  getCentroidPayload,
+  getProfilePayload
+} from './processConfig';
+import {
+  chartOptions
+} from './chartConfig';
+import { Coordinate } from 'ol/coordinate';
+import { Point } from 'ol/geom';
+import { fromLonLat } from 'ol/proj';
+import BaseLayer from 'ol/layer/Base';
 
 
 
@@ -65,6 +96,7 @@ const topographicData = ref({
 
 const initialized = ref(false)
 
+let elevationLineData: Position[]
 
 onMounted(() => {
   editionLayer.setVisible(true)
@@ -89,6 +121,33 @@ onDeactivated(() => {
 })
 
 
+const profileLayer = new VectorLayer({
+  source: new VectorSource({
+    features: [
+      new Feature(
+        new Point(fromLonLat([0, 0]))
+      )
+    ]
+  }),
+  zIndex: 100,
+  properties: {
+    'name': 'profileLayer'
+  }
+})
+
+mapStore.map?.addLayer(profileLayer)
+
+//@ts-ignore
+function drawPoint(event: MouseEvent, chartContext: ApexOptions, config: ApexDiscretePoint): void {
+
+  if (config.dataPointIndex !== -1 && config.dataPointIndex! < elevationLineData.length) {
+    const coordinate = elevationLineData[config.dataPointIndex!];
+
+    const transformedCoord = fromLonLat([coordinate[0], coordinate[1]]);
+    const pointFeature = profileLayer.getSource()?.getFeatures()[0].getGeometry()!
+    pointFeature.setCoordinates(transformedCoord)
+  }
+}
 
 /**
  * Fonction de récupération de la feature au format textuel.
@@ -204,6 +263,7 @@ async function profileProcesses(geom: string): Promise<void> {
   const OAProcessesRequest = await postData<OAProcessesProfileResult>(`${CONNECTION_PROPERTIES.ZOO_SERVER.URL}/GdalExtractProfile`, CONNECTION_PROPERTIES.ZOO_SERVER.ERROR, JSON.stringify(ProfilePayload));
 
   const elevationData = OAProcessesRequest!.Profile.value.coordinates.map(coordinate => parseFloat(coordinate[2].toFixed(2)));
+  elevationLineData = OAProcessesRequest!.Profile.value.coordinates
   topographicData.value.series[0].data = elevationData
 
   initialized.value = true

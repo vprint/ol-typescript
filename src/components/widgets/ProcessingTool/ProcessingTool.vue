@@ -65,7 +65,7 @@ import DrawTool from '../DrawTool/DrawTool.vue';
 import RenderFeature from 'ol/render/Feature';
 import VueApexCharts from 'vue3-apexcharts';
 import ApexDiscretePoint from 'vue3-apexcharts'
-import ApexOptions from 'vue3-apexcharts'
+import { ApexOptions } from 'apexcharts'
 import {
   getBufferPayload,
   getCentroidPayload,
@@ -78,7 +78,7 @@ import { Coordinate } from 'ol/coordinate';
 import { Point } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
 import BaseLayer from 'ol/layer/Base';
-
+import { transform } from 'ol/proj';
 
 
 const mapStore = useMapStore()
@@ -122,32 +122,37 @@ onDeactivated(() => {
 
 
 const profileLayer = new VectorLayer({
-  source: new VectorSource({
-    features: [
-      new Feature(
-        new Point(fromLonLat([0, 0]))
-      )
-    ]
-  }),
-  zIndex: 100,
+  source: new VectorSource(),
+  zIndex: 10,
   properties: {
     'name': 'profileLayer'
   }
 })
-
 mapStore.map?.addLayer(profileLayer)
 
-//@ts-ignore
+
 function drawPoint(event: MouseEvent, chartContext: ApexOptions, config: ApexDiscretePoint): void {
-
   if (config.dataPointIndex !== -1 && config.dataPointIndex! < elevationLineData.length) {
+    // Récupération et transformation en EPSG:3857 des coordonnées
     const coordinate = elevationLineData[config.dataPointIndex!];
-
     const transformedCoord = fromLonLat([coordinate[0], coordinate[1]]);
-    const pointFeature = profileLayer.getSource()?.getFeatures()[0].getGeometry()!
-    pointFeature.setCoordinates(transformedCoord)
+
+    // Création d'un point s'il n'existe pas déjà
+    if (profileLayer.getSource()!.getFeatures().length > 0) {
+      profileLayer.getSource()?.addFeature(
+        new Feature(
+          new Point(transformedCoord)
+        )
+      )
+    }
+    // modification des coordonnées du point si il existe déjà
+    else {
+      const pointFeature = profileLayer.getSource()?.getFeatures()[0].getGeometry()! as Point
+      pointFeature.setCoordinates(transformedCoord)
+    }
   }
 }
+
 
 /**
  * Fonction de récupération de la feature au format textuel.

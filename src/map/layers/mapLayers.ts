@@ -12,12 +12,21 @@ import MVT from 'ol/format/MVT';
 import ApiRequestor from 'src/services/Api/ApiRequestor';
 import { Style, Fill, Stroke } from 'ol/style';
 import { CONNECTION_PROPERTIES } from 'src/services/Api/enum';
+import WMTS from 'ol/source/WMTS.js';
+import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
+import { getTopLeft, getWidth } from 'ol/extent.js';
+import { get as getProjection, ProjectionLike } from 'ol/proj.js';
 
 /**
  * Gestionnaire de couches
  */
 class MapLayers {
-  private map;
+  private map: Map;
+  private projection = getProjection('EPSG:3857')
+  private projectionExtent = this.projection?.getExtent();
+  private size = getWidth(this.projectionExtent!) / 256;
+  private resolutions = new Array(19);
+  private matrixIds = new Array(19);
 
   constructor(map: Map) {
     this.map = map;
@@ -25,9 +34,21 @@ class MapLayers {
     this.addBackgroundLayers();
     this.addVectorLayers();
     this.addVectorTileLayers();
-    this.addRasterLayers();
+    this.initializeMatrix();
+    this.addWMSLayers();
+    this.addWMTSLayers();
   }
 
+  /**
+   * Initialisation de la grille wmts
+   */
+  private initializeMatrix(): void {
+    console.log('ce message en premier')
+    for (let z = 0; z < 19; ++z) {
+      this.resolutions[z] = this.size / Math.pow(2, z);
+      this.matrixIds[z] = z;
+    }
+  }
 
   /**
    * ajout des fonds de plan
@@ -154,31 +175,71 @@ class MapLayers {
 
 
   /**
-   * Fonction d'ajout des rasters
+   * Fonction d'ajout des couches WMS
    */
-  private addRasterLayers(): void {
+  private addWMSLayers(): void {
     for (const layer in RASTER_LAYERS_SETTINGS) {
       const rl = RASTER_LAYERS_SETTINGS[layer]
-      this.map.addLayer(
-        new ImageLayer({
-          source: new ImageWMS({
-            url: `${CONNECTION_PROPERTIES.QGIS_SERVER.URL}/wms?`,
-            params: { 'LAYERS': `${rl.NAME}` },
-            hidpi: false,
-            ratio: 1,
-            attributions: rl.ATTRIBUTION
+      if (rl.MODE === 'wms') {
+        this.map.addLayer(
+          new ImageLayer({
+            source: new ImageWMS({
+              url: `${CONNECTION_PROPERTIES.QGIS_SERVER.URL}/wms?`,
+              params: { 'LAYERS': `${rl.NAME}` },
+              attributions: rl.ATTRIBUTION
+            }),
+            properties: {
+              'name': `${rl.NAME}_wms`,
+              'title': rl.TITLE,
+              'description': rl.DESCRIPTION,
+              'editable': rl.EDITABLE,
+              'dynamic': rl.DYNAMIC
+            },
+            zIndex: rl.ZINDEX,
+            visible: rl.VISIBLE
+          })
+        )
+      }
+    }
+  }
+
+  /**
+   * Fonction d'ajout des couches WMTS
+   */
+  private addWMTSLayers(): void {
+    console.log('ce message après')
+    for (const layer in RASTER_LAYERS_SETTINGS) {
+      const rl = RASTER_LAYERS_SETTINGS[layer]
+      if (rl.MODE === 'wmts') {
+        this.map.addLayer(
+          new TileLayer({
+            source: new WMTS({
+              attributions: rl.ATTRIBUTION,
+              url: `${CONNECTION_PROPERTIES.MAPPROXY_SERVER.URL}/service`,
+              layer: 'svf',
+              matrixSet: 'webmercator',
+              format: 'image/png',
+              projection: this.projection as ProjectionLike,
+              tileGrid: new WMTSTileGrid({
+                origin: getTopLeft(this.projectionExtent!),
+                resolutions: this.resolutions,
+                matrixIds: this.matrixIds,
+              }),
+              style: 'default',
+              tilePixelRatio: 2
+            }),
+            properties: {
+              'name': `${rl.NAME}_wmts`,
+              'title': rl.TITLE,
+              'description': rl.DESCRIPTION,
+              'editable': rl.EDITABLE,
+              'dynamic': rl.DYNAMIC
+            },
+            zIndex: rl.ZINDEX,
+            visible: rl.VISIBLE
           }),
-          properties: {
-            'name': rl.NAME,
-            'title': rl.TITLE,
-            'description': rl.DESCRIPTION,
-            'editable': rl.EDITABLE,
-            'dynamic': rl.DYNAMIC
-          },
-          zIndex: rl.ZINDEX,
-          visible: rl.VISIBLE
-        })
-      )
+        )
+      }
     }
   }
 }

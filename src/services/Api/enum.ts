@@ -17,6 +17,10 @@ export const CONNECTION_PROPERTIES = {
     URL: 'http://localhost:8081/cgi-bin/qgis_mapserv.fcgi.exe?',
     ERROR: 'Le geo-serveur (QGS) est indisponible. Contactez l\'administrateur',
   },
+  MAPPROXY_SERVER: {
+    URL: 'http://localhost:8082',
+    ERROR: 'Le geo-serveur (MPX) est indisponible. Contactez l\'administrateur',
+  },
   ZOO_SERVER: {
     URL: 'http://localhost/ogc-api/processes',
     ERROR: 'Le serveur de géotraitement (ZOO) est indisponible. Contactez l\'administrateur',

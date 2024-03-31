@@ -50,6 +50,7 @@ export type IVectorLayerSettings = Record<string, IVectorLayerType>
 
 // Interface des couches rasters
 export interface IRasterLayerType {
+  MODE: 'wms' | 'wmts'
   NAME: string;
   TITLE: string;
   DESCRIPTION: string;

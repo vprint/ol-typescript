@@ -49,7 +49,7 @@ export const BACKGROUND_LAYERS_SETTINGS: IBackgroundLayerSettings = {
 
 export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
   CARTOGRAPHY_LAYER: {
-    ZINDEX: 4,
+    ZINDEX: 5,
     NAME: 'Features',
     TITLE: 'Cartgraphie',
     DESCRIPTION: 'Cartographie des entités archéologiques découverte dans le cadre des programmes KALC et CALI. La cartographie à été réalisée par l\'EFEO',
@@ -64,7 +64,7 @@ export const VECTOR_TILE_LAYERS_SETTINGS: IVectorTileLayerSettings = {
 
 export const VECTOR_LAYERS_SETTINGS: IVectorLayerSettings = {
   EDITION_LAYER: {
-    ZINDEX: 5,
+    ZINDEX: 6,
     NAME: 'Edition',
     SELECTIONNABLE: false,
     VISIBLE: false
@@ -74,22 +74,35 @@ export const VECTOR_LAYERS_SETTINGS: IVectorLayerSettings = {
 
 export const RASTER_LAYERS_SETTINGS: IRasterLayerSettings = {
   DEM: {
+    MODE: 'wms',
     ZINDEX: 2,
     NAME: 'DEM',
     TITLE: 'Elevation',
     DESCRIPTION: 'Couche d\'élévation obtenue à partir d\'une interpolation des données LiDAR',
     ATTRIBUTION: ['Données LiDAR | <b>EFEO</b>'],
-    VISIBLE: true,
+    VISIBLE: false,
     EDITABLE: true,
     DYNAMIC: true
   },
   SVF: {
+    MODE: 'wms',
     ZINDEX: 3,
     NAME: 'SVF',
     TITLE: 'Sky-View-Factor',
     DESCRIPTION: 'Le Sky-View-Factor est une méthode de visualisation des données altimétrique appréciée des archéologue. Elle permet de visualiser les zones enclavées dans des teintes sombres et les zones surélevées dans des teintes claires',
     ATTRIBUTION: ['Données LiDAR | <b>EFEO</b>'],
     VISIBLE: false,
+    EDITABLE: true,
+    DYNAMIC: false
+  },
+  SVF_WMTS: {
+    MODE: 'wmts',
+    ZINDEX: 4,
+    NAME: 'SVF',
+    TITLE: 'Sky-View-Factor (démonstration tuilage)',
+    DESCRIPTION: 'Cette couche WMTS est tuilée. Elle permet d\'observer la rapidité lié aux tuilage et au cache des données',
+    ATTRIBUTION: ['Données LiDAR | <b>EFEO</b>'],
+    VISIBLE: true,
     EDITABLE: true,
     DYNAMIC: false
   }
